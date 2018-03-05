@@ -51,6 +51,8 @@ var charObject = {
     
 }
 */
+var lorem = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem veritatis nihil magnam. Repellat eligendi, ipsa facere quas laudantium repudiandae nostrum harum deleniti amet officiis, laboriosam aperiam doloremque, officia ex iure. Quisquam sapiente iure libero quae obcaecati, at nobis temporibus sunt possimus distinctio assumenda a. Natus officiis molestias incidunt deserunt quam reprehenderit repudiandae pariatur vero corporis dolores rem, harum esse modi. Ullam, veritatis velit nulla vitae repellat eaque sint officiis delectus. Pariatur commodi, in ratione, modi sapiente quidem delectus cupiditate ullam vero ducimus exercitationem excepturi aut distinctio error perspiciatis nostrum voluptatibus! Dicta, est! Neque labore facilis harum nisi inventore, atque exercitationem porro non, earum ea, in distinctio? Totam, voluptate fuga! Quia ipsam corrupti accusantium alias unde eius quaerat! Distinctio, nobis labore! Culpa dolore voluptates excepturi, incidunt iure ad mollitia voluptatum animi similique impedit nisi voluptas quod doloribus error vero sapiente ab eveniet. Doloribus veritatis quod dicta optio ab sunt excepturi sapiente. Autem facere eaque sed. Possimus cum tempore quasi provident necessitatibus in culpa non odit magnam fugit unde animi totam quam esse accusantium, perferendis qui quos illum iure dolores vel molestiae. Nam adipisci eum architecto, placeat voluptate obcaecati ipsum odio labore sint nemo earum impedit asperiores et, pariatur cumque natus. Similique praesentium tenetur inventore itaque asperiores temporibus voluptates nemo odio vel. Architecto dolore suscipit, eos et atque id enim corrupti numquam tempora, molestias animi ab quasi, in veniam tempore impedit saepe eligendi doloribus. Aliquam totam voluptatum dolor eos, ea placeat quisquam. Est, et necessitatibus unde soluta suscipit accusamus, placeat cum maiores modi quasi alias? Modi aliquid natus dignissimos praesentium, dolorum beatae amet sequi a fugiat explicabo totam ratione velit minima sapiente? Ipsam delectus rem mollitia accusamus sapiente dolorum reprehenderit itaque minus quasi ipsum nulla rerum, a numquam consequuntur maiores quos odio, maxime cum odit nisi veniam architecto sunt! Adipisci, velit dolore!";
+
 function printC (str) {
     str = str + '<br>';
     $('#combatText').append(str);
@@ -370,7 +372,6 @@ $(document).ready(function () {
             //create a counter for the remaining enemies
             let a = Object.keys(game.chars);
             game.foeCounter = a.length;
-            console.log(game.foeCounter);
             game.storyPage(game.enemyChoose, "story shiz goes here, about like, how there's like, an arena and shit and you gotta fight some guys.");
 
         },//end playerChoose
@@ -460,12 +461,15 @@ $(document).ready(function () {
                 delete game.chars[defeated];
                 //decrement opponents
                 game.foeCounter--;
-                console.log(game.foeCounter);
                 //refresh player stats
                 game.player = copy(game.playerProto);
                 //pick next dewd
                 if(game.foeCounter > 0) {
-                    game.enemyChoose();
+                    game.storyPageFoe(
+                        game.enemyChoose,
+                        //add text to game chars for their death
+                        lorem
+                    );
                 }
                 //if no more dudes, this
                 if (game.foeCounter == 0) {
@@ -484,16 +488,37 @@ $(document).ready(function () {
                             .attr("src", game.player.imgSrcRight)
                             .attr("id", "player")
                         );//end append
-            $('#charPics').append($('<p>')
+            $('body').append($('<p>')
                         .text(str));
-            $('#charPics').append($('<button>')
+            $('body').append($('<button>')
                         .attr("id", "Continue")
                         .text("Continue")
                         .on("click", function(){
                             fx();
                         })
                     );//end append
-        }
+        }, //end storyPage
+
+        storyPageFoe: function (fx, str) {
+            //this chunk draws player in left corner with text
+            $('body').empty();
+            let a = $('<div>');
+            a.attr("id", "charPics").attr("class", "charPics");
+            $('body').append(a);
+            $('#charPics').append($('<img>')
+                            .attr("class", 'foeStoryPic')
+                            .attr("src", game.currentOpponent.imgSrcLeft)                            
+                        );//end append
+            $('body').append($('<p>')
+                        .text(str));
+            $('body').append($('<button>')
+                        .attr("id", "Continue")
+                        .text("Continue")
+                        .on("click", function(){
+                            fx();
+                        })
+                    );//end append
+        }, //end storyPage
 
     }//end game obj
 

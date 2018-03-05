@@ -1,6 +1,7 @@
 body {
     font-family: arial;
     margin: auto;
+    max-width: 960px;
 }
 
 .combatText {
@@ -16,4 +17,22 @@ body {
 
 #playerIntro {
     float: left;
+}
+
+.currentOpponent {
+    float: right;
+}
+.foeStoryPic {
+    float: right;
+}
+
+@media screen and (max-width: 401px) {
+    .charPics>img {
+        width: 170px;
+        height: 100%;
+    }
+    /* heh */
+    body {
+        background-color: red;
+    }
 }
