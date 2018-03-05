@@ -3,10 +3,12 @@ body {
     margin: auto;
 }
 
-.charChoice img, h1 {
-    float: left;
-}
+
 
 .enemies {
     clear: both;
+}
+
+#playerIntro {
+    float: left;
 }

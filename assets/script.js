@@ -58,13 +58,13 @@ function roll(sided) {
 }
 
 function mod(score) {
-    let x = (score - 10) / 2;
+    let x = Math.floor((score - 10) / 2);
     return x;
 }
 
 var charList = {
     char1: {
-        name: 'Ryu',
+        name: 'Knight',
         HP: 40,
         AC: 11,
         MP: 3,
@@ -80,18 +80,20 @@ var charList = {
             hadouken: fireball,
             twoFist: doubleAttack,
             innerChi: haste
-        }
+        },
+        imgSrcLeft:'./assets/images/char6left.png',
+        imgSrcRight:'./assets/images/char6right.png',
     },
 
     char2: {
-        name: 'M.Bison',
+        name: 'Sorcerer',
         HP: 35,
         AC: 10,
         MP: 2,
         SP: 4,
         strength: 15,
         dexterity: 11,
-        constitution: 10,
+        constitution: 15,
         intelligence: 10, 
         wisdom: 15,
         charisma: 10,
@@ -100,10 +102,12 @@ var charList = {
             Fist_of_Shadaloo: fireball,
             suckerPunch: doubleAttack,
             Speed_Of_Shadabooboo: haste,
-        }
+        },
+        imgSrcLeft:'./assets/images/char2left.png',
+        imgSrcRight:'./assets/images/char2right.png',
     },
     char3: {
-        name: 'E.Honda',
+        name: 'Rogue',
         HP: 40,
         AC: 11,
         MP: 3,
@@ -116,12 +120,14 @@ var charList = {
         charisma: 10,
         actions: {
             attack: attackIt,
-            handslap: fireball
-        }
+            handslap: fireball,
+        },
+        imgSrcLeft:'./assets/images/char3left.png',
+        imgSrcRight:'./assets/images/char3right.png',
     },
 
     char4: {
-        name: 'Chun-li',
+        name: 'Archer',
         HP: 35,
         AC: 10,
         MP: 0,
@@ -134,7 +140,29 @@ var charList = {
         charisma: 10,
         actions: {
             attack: attackIt,
+        },
+        imgSrcLeft:'./assets/images/char4left.png',
+        imgSrcRight:'./assets/images/char4right.png',
+    }
+}
+
+function copy(oldObject) {
+    var newObject = jQuery.extend(true, {}, oldObject);
+    return newObject;
+}
+
+function debuff(char) {
+    switch (char.debuff){
+        case 'poison':
+        char.HP-= 5;
+        console.log(char.name + " takes 5 pts of poison dmg!");
+        char.poisonCounter--;
+        if(char.poisonCounter < 0) {
+            delete char.poisonCounter;
+            delete char.debuff;
+            console.log(char.name + " is no longer poisoned");
         }
+        break;
     }
 }
 
@@ -150,14 +178,16 @@ function turn(char, opponent, act) {
         console.log('no such action!');
     }
 
-    if(char.status == 'haste') {
+    if(char.buff == 'haste') {
         char.hasteCounter--;
         if(char.hasteCounter < 0) {
-            delete char.status;
+            delete char.buff;
             delete char.hasteCounter;
         }
         return;
     }
+    debuff(char);
+
     cpuTurn(opponent, char);
     console.log(char.name + ' has ' + char.HP + 'HP left');
     console.log(opponent.name + ' has ' + opponent.HP + 'HP left');
@@ -173,30 +203,33 @@ function cpuTurn(cpu, target) {
     a(cpu, target);
 
     //haste conditional
-    if(cpu.status == 'haste') {
+    if(cpu.buff == 'haste') {
         cpu.hasteCounter--;
         if(cpu.hasteCounter < 0) {
-            delete cpu.status;
+            delete cpu.buff;
             delete cpu.hasteCounter;
             return;
         } 
         cpuTurn(cpu, target);
     }
+    debuff(cpu);
 
 }
 
-function autoTurn() {
-    attackIt(charList.char1, charList.char2);
-    attackIt(charList.char2, charList.char1);
-    console.log(charList.char1.name + ' has ' + charList.char1.HP + 'HP left');
-    console.log(charList.char2.name + ' has ' + charList.char2.HP + 'HP left');
+//debugging fx
+function autoTurn(player, cpu) {
+    cpuTurn(player, cpu);
+    cpuTurn(cpu, player);
+    console.log(player.name + ' has ' + player.HP + 'HP left');
+    console.log(cpu.name + ' has ' + cpu.HP + 'HP left');
 }
 
+//basic attack fx
 function attackIt(attacker, defender) {
     let diceRoll = roll(20);
     console.log(attacker.name + " rolled: ", diceRoll);    
     if(diceRoll >= defender.AC) {
-        let dmg = roll(attacker.strength);
+        let dmg = roll(6) + mod(attacker.strength);
         defender.HP-=dmg;
         console.log(attacker.name + " attacks " + defender.name +"!");
         console.log(defender.name + " takes " + dmg + " points of damage!");
@@ -205,6 +238,7 @@ function attackIt(attacker, defender) {
     }
 }
 
+//lazy implementation, change later
 function doubleAttack(attacker, defender) {
     attackIt(attacker, defender);
     attackIt(attacker, defender);
@@ -251,18 +285,187 @@ function fireball(attacker, defender) {
 }
 
 function haste(char) {
-    char.status = 'haste';
+    char.buff = 'haste';
     char.hasteCounter = Math.floor(char.dexterity / 5);
     //all this junk gets the name of the key this function is stored to in char's object
     let x = Object.values(char.actions);
     let y = x.indexOf(haste);
     let z = Object.keys(char.actions);
     console.log(char.name + " casts " + z[y] + "!");
+    char.MP-=2;
+    if(char.MP <= 0) {
+        //get list of actions' function names
+        let x = Object.values(char.actions);
+        //find index of this function
+        let y = x.indexOf(haste);
+        //get list of actions' keys
+        let z = Object.keys(char.actions)
+        //delete this obj's action['thisFxName']
+        delete char.actions[z[y]];        
+    }   
 }
 
 function poison(attacker, defender) {
     let diceRoll = roll(20);
-    if (diceRoll + mod(defender.constitution < 15)) {
-        char.status = 'poison';
+    console.log("poison roll: " + diceRoll);
+    let adjRoll = diceRoll + mod(defender.constitution)
+    console.log("poison roll + const mod: " + adjRoll);
+    
+    if (diceRoll + mod(defender.constitution) < 13) {
+        defender.debuff = 'poison';
+        defender.poisonCounter = 5 - mod(defender.constitution);
+        console.log(defender.name + " is poisoned!");
     }
 }
+
+//game shiz
+
+$(document).ready(function () {
+    var game = {
+        //after intro text, this fx allows player to choose a character to play as
+        characterSelect: function() {
+            //clear body
+            $('body').empty();
+            //copy list of chars
+            game.chars = copy(charList);
+            console.log(game.chars);
+            //ask to pick char
+            let intro = $('<h1>');
+            intro.attr("id", "instr")
+                .attr("class", "instr")
+                .text("Choose your Character");
+            $('body').append(intro);
+            //get img for each char
+            let charSelDiv = $('<div>');
+            charSelDiv.addClass("charSelDiv");
+            let x = Object.keys(game.chars);
+            for (let i = 0; i < x.length; i++) {
+                let y = $('<img>');
+                let z = game.chars[x[i]];
+                y.attr("src", z.imgSrcRight)
+                    .attr("id", x[i]);
+                //attach click fx for char to allowuser to choose
+                y.on("click", function() {
+                    game.playerChoose(this);
+                });
+                console.log(y);
+                charSelDiv.append(y);
+            }
+            $('body').append(charSelDiv);
+        },
+        //after choosing a char, this fx sets up text to explain that char has to fight others
+        playerChoose: function (x) {
+            console.log($(x).attr("id"));
+            let y = $(x).attr("id");
+            //make property for player obj
+            game.player = copy(game.chars[y]);
+            //remove player from list of chars
+            delete game.chars[y];
+            console.log("You chose " + game.player.name);
+            console.log(game.chars);
+            $('body').empty();
+            let a = $('<div>');
+            a.attr("id", "charPics").attr("class", "charPics");
+            $('body').append(a);
+            $('#charPics').append($('<img>')
+                            .attr("src", game.player.imgSrcRight)
+                            .attr("id", "playerIntro")
+                        );//end append
+            $('#charPics').append($('<p>')
+                        .text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla accumsan feugiat dui ac tincidunt. Mauris pretium nisi non lectus consectetur tempor. Integer odio sapien, mattis ut blandit vel, tempor non purus. Vestibulum non magna sem. Integer blandit sapien quis laoreet tristique. Nulla tempor dui hendrerit accumsan tempor. Vivamus consequat diam libero, ut fermentum nulla auctor non. Nam vulputate quis nisi quis varius. Vestibulum laoreet nisi eu diam porta ultrices. Ut non ultrices felis. Mauris lectus enim, fermentum id dolor nec, dapibus semper purus. Vestibulum vehicula augue molestie, ornare magna in, tempor erat. Mauris ultricies ante ipsum, et sollicitudin magna consectetur eu. Aenean malesuada sem nec diam laoreet, quis egestas velit placerat. Fusce odio velit, dictum in luctus vel, maximus ac justo. Phasellus sit amet eros quis tortor cursus ultricies. Etiam quis vulputate est. Aliquam faucibus elit eget lobortis interdum. Praesent dictum tempus consectetur. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent aliquet diam massa, in feugiat ante suscipit at. Donec mattis lacus id ante rhoncus, rhoncus ultricies sapien luctus. Sed condimentum porttitor eros, eget hendrerit diam consectetur rhoncus. Maecenas facilisis vestibulum diam. Pellentesque rutrum eleifend eros, ut elementum nunc. Phasellus non justo a ex sagittis efficitur. Donec pharetra ultricies bibendum. In non arcu sit amet velit commodo posuere et in odio. Integer semper dictum est vel viverra. Aliquam erat volutpat. Sed ac turpis metus. Duis ultricies mollis tempor. Mauris at magna nibh. Duis ultrices pretium est sed molestie. Sed vitae ante semper, sodales ante vitae, vehicula turpis. In et justo orci. Nullam lobortis purus urna, eu semper arcu rhoncus non. Phasellus viverra finibus est et tempor. Mauris faucibus at velit eu semper. Sed condimentum tempus libero, sit amet maximus dolor tristique quis. Fusce auctor nulla consectetur quam varius auctor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed rhoncus arcu sed leo pretium ultrices. Phasellus tristique lorem nec ligula consectetur, nec venenatis tortor tempus. Sed vel elit tincidunt, eleifend sem ornare, imperdiet risus. Donec tempus ex nec volutpat viverra. Sed nec fringilla ipsum, a lobortis dolor.")
+                        );//end append
+            $('#charPics').append($('<button>')
+                        .attr("id", "start")
+                        .text("Continue")
+                        .on("click", function(){
+                            game.enemyChoose();
+                        })
+                    );//end append
+
+        },
+        //this fx shows char pic and allows char to choose enemy
+        enemyChoose: function () {
+            $('body').empty();
+            $('body').append(
+                $('<div>').attr("id", "charPics").attr("class", "charPics")
+            );//end append
+            $('#charPics').append($('<img>')
+                            .attr("src", game.player.imgSrcRight)
+                            .attr("id", "player")
+            );//end append
+            $('body').append($('<h1>')
+                        .attr("class", "instr")
+                        .attr("id", "instr")
+                        .text("Choose Your Opponent")
+            );//end append
+            //create opponent images
+            let a = $('<div>').attr("id", "enemies").attr("class", "enemies");
+            let x = Object.keys(game.chars);
+            console.log(x);
+            for(let i = 0; i < x.length; i++){
+                let y = $('<img>');
+                let z = game.chars[x[i]];
+                console.log(z);
+                y.attr("src", z.imgSrcRight)
+                .attr("id", x[i])
+                .on("click", function() {
+                    game.enterBattle(this);
+                });
+                a.append(y);
+            }
+
+            $('body').append(a);
+        },
+        enterBattle: function(x) {
+            //x is the pic, use the id
+            let enemy = $(x).attr("id");
+            game.currentOpponent = copy(game.chars[enemy]);
+            
+            console.log(enemy);
+            //add pic of enemy to right of player
+            let y = $('<img>')
+                    .attr("src", game.currentOpponent.imgSrcLeft)
+                    .attr("id", "currentOpponent");
+            $('#charPics').append(y);
+            //remove enemy pics
+            $('#enemies').remove();
+            $('#instr').remove();
+            //add div for combat text
+            let textBox = $('<div>').attr("id", "combatText").attr("class", "combatText");
+            $('body').append(textBox);
+            //add div for btns
+            let actionBtns = $('<div>').attr("id", "actionBtns").attr("class", "actionBtns");
+            $('body').append(actionBtns);
+            game.drawButtons();
+        },//end enterBattle
+
+        drawButtons: function() {
+            $('#actionBtns').empty();
+            //populate action buttons with a fx for char's actions
+            let act = Object.keys(game.player.actions);
+            console.log(act);
+            for(i = 0; i < act.length; i++){
+                let btn = $('<button>').attr("class", "actionBtn").text(act[i]);
+                $(btn).on("click", function(){
+                    turn(game.player, game.currentOpponent, $(this).text());
+                    if(game.player.HP <= 0){
+                        game.characterSelect();
+                    } else if(game.currentOpponent.HP <= 0) {
+                        //delete this char from opponents
+                        game.chars
+                        game.enemyChoose();                        
+                    }
+                    game.drawButtons();
+                });
+                $('#actionBtns').append(btn);
+            }//end for lp
+            
+        },
+
+    }//end game obj
+
+    $('#initial').on("click", "#start", function() {
+        game.characterSelect();
+    });
+    
+});
