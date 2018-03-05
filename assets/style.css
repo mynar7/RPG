@@ -3,7 +3,12 @@ body {
     margin: auto;
 }
 
-
+.combatText {
+    height: 300px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
+}
 
 .enemies {
     clear: both;

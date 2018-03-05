@@ -51,6 +51,13 @@ var charObject = {
     
 }
 */
+function printC (str) {
+    str = str + '<br>';
+    $('#combatText').append(str);
+    let element = $('#combatText');
+    element.scrollTop = element.scrollHeight;
+}
+
 //roll dice!
 function roll(sided) {
     var x = Math.floor(Math.random() * sided + 1);
@@ -127,7 +134,7 @@ var charList = {
     },
 
     char4: {
-        name: 'Archer',
+        name: 'Monk',
         HP: 35,
         AC: 10,
         MP: 0,
@@ -155,12 +162,12 @@ function debuff(char) {
     switch (char.debuff){
         case 'poison':
         char.HP-= 5;
-        console.log(char.name + " takes 5 pts of poison dmg!");
+        printC(char.name + " takes 5 pts of poison dmg!");
         char.poisonCounter--;
         if(char.poisonCounter < 0) {
             delete char.poisonCounter;
             delete char.debuff;
-            console.log(char.name + " is no longer poisoned");
+            printC(char.name + " is no longer poisoned");
         }
         break;
     }
@@ -175,7 +182,7 @@ function turn(char, opponent, act) {
         let y = char.actions[act];
         y(char, opponent);
     } else {
-        console.log('no such action!');
+        printC('no such action!');
     }
 
     if(char.buff == 'haste') {
@@ -189,8 +196,9 @@ function turn(char, opponent, act) {
     debuff(char);
 
     cpuTurn(opponent, char);
-    console.log(char.name + ' has ' + char.HP + 'HP left');
-    console.log(opponent.name + ' has ' + opponent.HP + 'HP left');
+    printC(char.name + ' has ' + char.HP + 'HP left');
+    printC(opponent.name + ' has ' + opponent.HP + 'HP left');
+    printC('{-------------------------------}');
     
     
 }
@@ -220,21 +228,21 @@ function cpuTurn(cpu, target) {
 function autoTurn(player, cpu) {
     cpuTurn(player, cpu);
     cpuTurn(cpu, player);
-    console.log(player.name + ' has ' + player.HP + 'HP left');
-    console.log(cpu.name + ' has ' + cpu.HP + 'HP left');
+    printC(player.name + ' has ' + player.HP + 'HP left');
+    printC(cpu.name + ' has ' + cpu.HP + 'HP left');
 }
 
 //basic attack fx
 function attackIt(attacker, defender) {
     let diceRoll = roll(20);
-    console.log(attacker.name + " rolled: ", diceRoll);    
+    printC(attacker.name + " rolled: " + diceRoll);    
     if(diceRoll >= defender.AC) {
         let dmg = roll(6) + mod(attacker.strength);
         defender.HP-=dmg;
-        console.log(attacker.name + " attacks " + defender.name +"!");
-        console.log(defender.name + " takes " + dmg + " points of damage!");
+        printC(attacker.name + " attacks " + defender.name +"!");
+        printC(defender.name + " takes " + dmg + " points of damage!");
     } else {
-        console.log(attacker.name + " attacks " + defender.name + " but misses!");
+        printC(attacker.name + " attacks " + defender.name + " but misses!");
     }
 }
 
@@ -257,7 +265,7 @@ function doubleAttack(attacker, defender) {
 
 function fireball(attacker, defender) {
     let diceRoll = roll(20);
-    console.log(attacker.name + " rolled: ", diceRoll);    
+    printC(attacker.name + " rolled: " + diceRoll);    
     //all this junk gets the name of the key this function is stored to in char's object
     let x = Object.values(attacker.actions);
     let y = x.indexOf(fireball);
@@ -266,10 +274,10 @@ function fireball(attacker, defender) {
     if(diceRoll >= defender.dexterity) {
         let dmg = roll(attacker.intelligence);
         defender.HP-=dmg;
-        console.log(attacker.name + " casts " + z[y] + " at " + defender.name +"!");
-        console.log(defender.name + " takes " + dmg + " points of damage!");
+        printC(attacker.name + " casts " + z[y] + " at " + defender.name +"!");
+        printC(defender.name + " takes " + dmg + " points of damage!");
     } else {
-        console.log(attacker.name + " casts " + z[y] + " at "  + defender.name + ", but " + defender.name + " dodges the blast!");
+        printC(attacker.name + " casts " + z[y] + " at "  + defender.name + ", but " + defender.name + " dodges the blast!");
     }
     attacker.MP--;
     if(attacker.MP <= 0) {
@@ -291,7 +299,7 @@ function haste(char) {
     let x = Object.values(char.actions);
     let y = x.indexOf(haste);
     let z = Object.keys(char.actions);
-    console.log(char.name + " casts " + z[y] + "!");
+    printC(char.name + " casts " + z[y] + "!");
     char.MP-=2;
     if(char.MP <= 0) {
         //get list of actions' function names
@@ -307,14 +315,14 @@ function haste(char) {
 
 function poison(attacker, defender) {
     let diceRoll = roll(20);
-    console.log("poison roll: " + diceRoll);
+    printC("poison roll: " + diceRoll);
     let adjRoll = diceRoll + mod(defender.constitution)
-    console.log("poison roll + const mod: " + adjRoll);
+    printC("poison roll + const mod: " + adjRoll);
     
     if (diceRoll + mod(defender.constitution) < 13) {
         defender.debuff = 'poison';
         defender.poisonCounter = 5 - mod(defender.constitution);
-        console.log(defender.name + " is poisoned!");
+        printC(defender.name + " is poisoned!");
     }
 }
 
@@ -359,6 +367,7 @@ $(document).ready(function () {
             let y = $(x).attr("id");
             //make property for player obj
             game.player = copy(game.chars[y]);
+            game.playerProto = copy(game.chars[y]);
             //remove player from list of chars
             delete game.chars[y];
             console.log("You chose " + game.player.name);
@@ -425,7 +434,8 @@ $(document).ready(function () {
             //add pic of enemy to right of player
             let y = $('<img>')
                     .attr("src", game.currentOpponent.imgSrcLeft)
-                    .attr("id", "currentOpponent");
+                    .attr("class", "currentOpponent")
+                    .attr("id", enemy);
             $('#charPics').append(y);
             //remove enemy pics
             $('#enemies').remove();
@@ -452,7 +462,10 @@ $(document).ready(function () {
                         game.characterSelect();
                     } else if(game.currentOpponent.HP <= 0) {
                         //delete this char from opponents
-                        game.chars
+                        let defeated = $('.currentOpponent').attr("id");
+                        delete game.chars[defeated];
+                        //refresh player stats
+                        game.player = copy(game.playerProto);
                         game.enemyChoose();                        
                     }
                     game.drawButtons();
