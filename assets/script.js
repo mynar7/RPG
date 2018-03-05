@@ -74,16 +74,19 @@ function mod(score) {
 var charList = {
     char1: {
         name: 'Knight',
-        HP: 40,
-        AC: 15,
+        HP: 22,
+        AC: 18,
         MP: 0,
         SP: 4,
-        strength: 17,
-        dexterity: 11,
+        damage: 8,
+        dmgBns: 3,
+        prof: 2,
+        strength: 16,
+        dexterity: 9,
         constitution: 15,
-        intelligence: 10, 
-        wisdom: 15,
-        charisma: 10,
+        intelligence: 13, 
+        wisdom: 11,
+        charisma: 14,
         actions: {
             Attack: attackIt,
             Double_Slash: doubleAttack,
@@ -95,16 +98,21 @@ var charList = {
 
     char2: {
         name: 'Sorcerer',
-        HP: 25,
-        AC: 8,
+        HP: 17,
+        AC: 13,
         MP: 2,
         SP: 4,
-        strength: 9,
-        dexterity: 11,
-        constitution: 13,
-        intelligence: 15, 
-        wisdom: 15,
-        charisma: 10,
+        damage: 6, //+3. but 1d10 flat with fireball
+        dmgBns: 3,
+        spellDmg: 10,
+        prof: 2,
+        spellProf: 6,
+        strength: 10,
+        dexterity: 16,
+        constitution: 12,
+        intelligence: 16, 
+        wisdom: 13,
+        charisma: 8,
         actions: {
             Attack: attackIt,
             Fireball: fireball,
@@ -114,18 +122,22 @@ var charList = {
     },
     char3: {
         name: 'Rogue',
-        HP: 30,
-        AC: 11,
+        HP: 18,
+        AC: 14,
         MP: 0,
         SP: 0,
-        strength: 12,
-        dexterity: 18,
-        constitution: 11,
-        intelligence: 14, 
-        wisdom: 8,
-        charisma: 10,
+        damage: 6, //+3? 
+        dmgBns: 3,
+        prof: 4,
+        strength: 8,
+        dexterity: 16,
+        constitution: 10,
+        intelligence: 13, 
+        wisdom: 12,
+        charisma: 16,
         actions: {
             Stab: attackIt,
+            Poison_Strike: poisonAttack,
         },
         imgSrcLeft:'./assets/images/char3left.png',
         imgSrcRight:'./assets/images/char3right.png',
@@ -133,16 +145,19 @@ var charList = {
 
     char4: {
         name: 'Monk',
-        HP: 35,
-        AC: 11,
+        HP: 20,
+        AC: 15,
         MP: 0,
         SP: 7,
-        strength: 13,
-        dexterity: 14,
-        constitution: 17,
+        damage: 4, //+4
+        dmgBns: 4,
+        prof: 2,
+        strength: 8,
+        dexterity: 17,
+        constitution: 14,
         intelligence: 10, 
-        wisdom: 15,
-        charisma: 7,
+        wisdom: 14,
+        charisma: 12,
         actions: {
             Punch: attackIt,
             Quick_Fist: doubleAttack,
@@ -161,7 +176,7 @@ function copy(oldObject) {
 function debuff(char) {
     switch (char.debuff){
         case 'poison':
-        char.HP-= 5;
+        char.HP-= 2;
         printC(char.name + " takes 5 pts of poison dmg!");
         char.poisonCounter--;
         if(char.poisonCounter < 0) {
@@ -236,8 +251,8 @@ function autoTurn(player, cpu) {
 function attackIt(attacker, defender) {
     let diceRoll = roll(20);
     printC(attacker.name + " rolled: " + diceRoll);    
-    if(diceRoll >= defender.AC) {
-        let dmg = roll(6) + mod(attacker.strength);
+    if(diceRoll + attacker.prof>= defender.AC) {
+        let dmg = roll(attacker.damage) + attacker.dmgBns;
         defender.HP-=dmg;
         printC(attacker.name + " attacks " + defender.name +"!");
         printC(defender.name + " takes " + dmg + " points of damage!");
@@ -271,8 +286,8 @@ function fireball(attacker, defender) {
     let y = x.indexOf(fireball);
     let z = Object.keys(attacker.actions);
 
-    if(diceRoll >= defender.dexterity) {
-        let dmg = roll(attacker.intelligence);
+    if(diceRoll + attacker.spellProf >= defender.AC) {
+        let dmg = roll(attacker.spellDmg) + attacker.dmgBns;
         defender.HP-=dmg;
         printC(attacker.name + " casts " + z[y] + " at " + defender.name +"!");
         printC(defender.name + " takes " + dmg + " points of damage!");
@@ -312,14 +327,25 @@ function haste(char) {
         delete char.actions[z[y]];        
     }   
 }
-
+function poisonAttack(attacker, defender) {
+    let diceRoll = roll(20);
+    printC(attacker.name + " coats their weapon with poison!");        
+    printC(attacker.name + " rolled: " + diceRoll);    
+    if(diceRoll + attacker.prof>= defender.AC) {
+        let dmg = roll(attacker.damage) + attacker.dmgBns;
+        defender.HP-=dmg;
+        printC(attacker.name + " attacks " + defender.name +"!");
+        printC(defender.name + " takes " + dmg + " points of damage!");
+        poison(attacker, defender);
+    } else {
+        printC(attacker.name + " attacks " + defender.name + " but misses!");
+    }
+}
 function poison(attacker, defender) {
     let diceRoll = roll(20);
-    printC("poison roll: " + diceRoll);
-    let adjRoll = diceRoll + mod(defender.constitution)
-    printC("poison roll + const mod: " + adjRoll);
+    printC("Poison saving throw: " + diceRoll);
     
-    if (diceRoll + mod(defender.constitution) < 13) {
+    if (diceRoll + mod(defender.constitution) <= 15) {
         defender.debuff = 'poison';
         defender.poisonCounter = 5 - mod(defender.constitution);
         printC(defender.name + " is poisoned!");
@@ -453,7 +479,7 @@ $(document).ready(function () {
             }
             //if you die, this
             if(game.player.HP <= 0){
-                game.storyPage(game.characterSelect, "You lost");
+                game.battleWon(game.characterSelect, "You lost", 'player');
             //if you win a battle, this
             } else if(game.currentOpponent.HP <= 0) {
                 //delete this char from opponents
@@ -465,17 +491,38 @@ $(document).ready(function () {
                 game.player = copy(game.playerProto);
                 //pick next dewd
                 if(game.foeCounter > 0) {
-                    game.storyPageFoe(
-                        game.enemyChoose,
-                        //add text to game chars for their death
-                        lorem
-                    );
+                    game.battleWon(game.enemyChoose , lorem, 'foe');
                 }
                 //if no more dudes, this
                 if (game.foeCounter == 0) {
-                    game.storyPage(game.characterSelect, "You Won dewd");
+                    game.battleWon(game.characterSelect, "You Won dewd", 'player');
                 }
             }
+        },
+
+        //this allows battle to end, and shows text in combatText saying who won
+        battleWon: function(fx, str, pic) {
+            $('#actionBtns').empty();
+            let a;
+        
+            if(pic == 'player') {
+                a = game.storyPage;
+            } else {
+                a = game.storyPageFoe;
+            }
+            if(game.player.HP > 0) {
+                printC(game.player.name + " defeated " + game.currentOpponent.name + '!');
+            } else if (game.currentOpponent.HP > 0) {
+                printC(game.currentOpponent.name + " defeated " + game.player.name + '!');
+            } else {
+                printC(game.player.name + " and " + game.currentOpponent.name + 'defeated each other!');                
+            }
+            let x = $('<button>').attr('id', 'Continue').text('Continue').on("click", function(){
+                a(fx, str);
+            });
+
+            $('#actionBtns').append(x)
+
         },
 
         storyPage: function (fx, str) {
