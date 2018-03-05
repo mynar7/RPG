@@ -65,22 +65,25 @@ function roll(sided) {
     var x = Math.floor(Math.random() * sided + 1);
     return x;
 }
-
+//stat modifier
 function mod(score) {
     let x = Math.floor((score - 10) / 2);
-    return x;
+    if (x < 0) {
+        return 0;
+    } else {
+        return x;
+    }
 }
 
 var charList = {
     char1: {
         name: 'Knight',
         HP: 22,
-        AC: 18,
+        AC: 13,
         MP: 0,
-        SP: 4,
+        SP: 2,
         damage: 8,
         dmgBns: 3,
-        prof: 2,
         strength: 16,
         dexterity: 9,
         constitution: 15,
@@ -90,7 +93,6 @@ var charList = {
         actions: {
             Attack: attackIt,
             Double_Slash: doubleAttack,
-            Berserk: haste,
         },
         imgSrcLeft:'./assets/images/char6left.png',
         imgSrcRight:'./assets/images/char6right.png',
@@ -261,10 +263,18 @@ function attackIt(attacker, defender) {
     }
 }
 
-//lazy implementation, change later
 function doubleAttack(attacker, defender) {
-    attackIt(attacker, defender);
-    attackIt(attacker, defender);
+
+    //get list of actions' function names
+    let x = Object.values(attacker.actions);
+    //find index of this function
+    let y = x.indexOf(doubleAttack);
+    //get list of actions' keys
+    let z = Object.keys(attacker.actions);
+    //z[y] is attack name!
+    printC(attacker.name + ' uses ' + z[y] + '!');
+
+    multiAttack(attacker, defender, 2);
     attacker.SP--;
     if(attacker.SP <= 0) {
         //get list of actions' function names
@@ -272,10 +282,48 @@ function doubleAttack(attacker, defender) {
         //find index of this function
         let y = x.indexOf(doubleAttack);
         //get list of actions' keys
-        let z = Object.keys(attacker.actions)
+        let z = Object.keys(attacker.actions);
         //delete this obj's action['thisFxName']
         delete attacker.actions[z[y]];        
+    }   
+}
+
+//lazy implementation, change later
+function multiAttack(attacker, defender, rounds) {
+    let hits = 0;
+    let dmg = 0;
+    if(rounds > 2) {
+        printC(attacker.name + " unleashes a flurry of attacks!")
+    } else {
+        printC(attacker.name + " attacks twice!")
     }
+    for (let i = 0; i < rounds; i++) {
+        if(roll(20) > defender.AC) {
+            dmg+= roll(attacker.damage) + attacker.dmgBns;
+            hits++;
+        }
+    }//end for
+    switch (hits) {
+        case 2:
+        printC(attacker.name + " connects with both attacks!");
+        break;
+
+        case 1:
+        printC(attacker.name + " only connects with one of the attacks!");
+        break;
+
+        case 0:
+        printC(defender.name + ' manages to avoid the attacks!');
+        break;
+
+        default:
+        printC(attacker.name + ' lands ' + hits + ' of the attacks!');
+        break;
+    }
+    if(hits > 0) {
+        printC(defender.name + ' takes ' + dmg + ' points of damage!');
+    }
+    defender.HP-=dmg;
 }
 
 function fireball(attacker, defender) {
@@ -301,7 +349,7 @@ function fireball(attacker, defender) {
         //find index of this function
         let y = x.indexOf(fireball);
         //get list of actions' keys
-        let z = Object.keys(attacker.actions)
+        let z = Object.keys(attacker.actions);
         //delete this obj's action['thisFxName']
         delete attacker.actions[z[y]];        
     }   
@@ -309,7 +357,7 @@ function fireball(attacker, defender) {
 
 function haste(char) {
     char.buff = 'haste';
-    char.hasteCounter = Math.floor(char.dexterity / 5);
+    char.hasteCounter = mod(char.dexterity);
     //all this junk gets the name of the key this function is stored to in char's object
     let x = Object.values(char.actions);
     let y = x.indexOf(haste);
@@ -322,7 +370,7 @@ function haste(char) {
         //find index of this function
         let y = x.indexOf(haste);
         //get list of actions' keys
-        let z = Object.keys(char.actions)
+        let z = Object.keys(char.actions);
         //delete this obj's action['thisFxName']
         delete char.actions[z[y]];        
     }   
