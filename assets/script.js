@@ -416,14 +416,18 @@ function poisonAttack(attacker, defender) {
 }
 
 function poison(attacker, defender) {
-    let diceRoll = roll(20);
-    
-    if (diceRoll + mod(defender.constitution) <= 15) {
-        defender.debuff = 'poison';
-        defender.poisonCounter = roll(6) - mod(defender.constitution);
-        printC(defender.name + " is poisoned!");
-    } else {
+	//perform poison saving throw, if successfull, roll rounds of poison dmg
+    if (roll(20) + mod(defender.constitution) <= 15) {
+		//determine poisonCounter
+        let x = roll(6) - mod(defender.constitution);
+    }
+	//if poisonCounter is less than 0, resisted
+	if(x < 0) {
 		printC(defender.name + " resists the poison!");
+	} else {
+		defender.debuff = 'poison';
+		defender.poisonCounter = x;
+		printC(defender.name + " is poisoned!");
 	}
 }
 
