@@ -150,8 +150,8 @@ var charList = {
         AC: 10,
         MP: 0,
         SP: 3,
-        damage: 3,
-        dmgBns: 3,
+        damage: 2,
+        dmgBns: 2,
         strength: 8,
         dexterity: 17,
         constitution: 14,
@@ -183,7 +183,7 @@ function copy(oldObject) {
 function levelUp(char) {
     char.HP += roll(6) + mod(char.constitution);
     char.damage++;
-    char.dmgBns += roll(4);
+    char.dmgBns++;
     char.strength += roll(4) + mod(char.strength);
     char.dexterity += roll(4) + mod(char.dexterity);
     char.constitution += roll(4) + mod(char.constitution);
@@ -294,10 +294,8 @@ function autoTurn(player, cpu) {
 }
 
 //basic attack fx
-function attackIt(attacker, defender, fx, num) {
-    let diceRoll = roll(20);
-    printC(attacker.name + " rolled: " + diceRoll);    
-    if(diceRoll + mod(attacker.dexterity) >= defender.AC) {
+function attackIt(attacker, defender, fx, num) { 
+    if(roll(20) + mod(attacker.dexterity) >= defender.AC) {
         let dmg = roll(attacker.damage) + attacker.dmgBns;
         defender.HP-=dmg;
         printC(attacker.name + " attacks " + defender.name +"!");
@@ -435,19 +433,15 @@ function poisonAttack(attacker, defender) {
 
 function poison(attacker, defender) {
 	//perform poison saving throw, if successfull, roll rounds of poison dmg
-    if (roll(20) + mod(defender.constitution) <= 15) {
+    if (roll(20) + mod(defender.constitution) <= 13 + mod(attacker.dexterity)) {
 		//determine poisonCounter
-        let x = roll(6) - mod(defender.constitution);
+        defender.debuff = 'poison';
+        defender.poisonCounter = roll(6);
+        printC(defender.name + " is poisoned!");
+    } else {
+        printC(defender.name + " resists the poison!");
     }
-	//if poisonCounter is less than 0, resisted
-	if(x < 0) {
-		printC(defender.name + " resists the poison!");
-	} else {
-		defender.debuff = 'poison';
-		defender.poisonCounter = x;
-		printC(defender.name + " is poisoned!");
-	}
-}
+}//end function
 
 function kick(attacker, defender) {
     //get list of actions' function names
@@ -507,7 +501,6 @@ $(document).ready(function () {
                 y.on("click", function() {
                     game.playerChoose(this);
                 });
-                console.log(y);
                 charSelDiv.append(y);
             }
             $('body').append(charSelDiv);
