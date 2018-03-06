@@ -181,9 +181,13 @@ function levelUp(char) {
 function debuff(char) {
     switch (char.debuff){
         case 'poison':
-			let psnDmg = roll(6) - mod(char.constitution);
-        	char.HP-= psnDmg;
-        	printC(char.name + " takes " + psnDmg + "pts of poison dmg!");
+		let psnDmg = roll(6) - mod(char.constitution);
+        	if(psnDmg > 0) {
+		   		char.HP-= psnDmg;
+        		printC(char.name + " takes " + psnDmg + "pts of poison dmg!");
+			} else {
+				printC(char.name + " resists poison damage!");
+			}
         	char.poisonCounter--;
         	if(char.poisonCounter < 0) {
             	delete char.poisonCounter;
