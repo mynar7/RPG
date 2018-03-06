@@ -68,11 +68,7 @@ function roll(sided) {
 //stat modifier
 function mod(score) {
     let x = Math.floor((score - 10) / 2);
-    if (x < 0) {
-        return 0;
-    } else {
-        return x;
-    }
+    return x;
 }
 
 var charList = {
@@ -104,11 +100,8 @@ var charList = {
         AC: 13,
         MP: 2,
         SP: 4,
-        damage: 6, //+3. but 1d10 flat with fireball
-        dmgBns: 3,
-        spellDmg: 10,
-        prof: 2,
-        spellProf: 6,
+        damage: 3, //+3. but 1d10 flat with fireball
+        dmgBns: 2,
         strength: 10,
         dexterity: 16,
         constitution: 12,
@@ -124,13 +117,12 @@ var charList = {
     },
     char3: {
         name: 'Rogue',
-        HP: 18,
-        AC: 14,
+        HP: 12,
+        AC: 15,
         MP: 0,
-        SP: 0,
-        damage: 6, //+3? 
+        SP: 3,
+        damage: 7, //+3? 
         dmgBns: 3,
-        prof: 4,
         strength: 8,
         dexterity: 16,
         constitution: 10,
@@ -140,6 +132,7 @@ var charList = {
         actions: {
             Stab: attackIt,
             Poison_Strike: poisonAttack,
+            Groin_Kick: kick,
         },
         imgSrcLeft:'./assets/images/char3left.png',
         imgSrcRight:'./assets/images/char3right.png',
@@ -147,13 +140,12 @@ var charList = {
 
     char4: {
         name: 'Monk',
-        HP: 20,
-        AC: 15,
+        HP: 30,
+        AC: 10,
         MP: 0,
-        SP: 7,
-        damage: 4, //+4
-        dmgBns: 4,
-        prof: 2,
+        SP: 3,
+        damage: 3,
+        dmgBns: 3,
         strength: 8,
         dexterity: 17,
         constitution: 14,
@@ -194,6 +186,18 @@ function debuff(char) {
 function turn(char, opponent, act) {
     //what did player choose to do?
     //can player do that?
+
+    //stunned
+    if(char.stunCounter <= 0) {
+        delete char.stunCounter;
+        delete char.stunned;
+    }
+    if(char.stunned == true) {
+        char.stunCounter--;
+        printC(char.name + " is stunned and cannot move!");
+        return;
+    }
+    //technically, this is unnecessary, but I'm checking anyway
     let x = Object.keys(char.actions);
     if(x.indexOf(act) > -1) {        
         let y = char.actions[act];
@@ -221,6 +225,17 @@ function turn(char, opponent, act) {
 }
 
 function cpuTurn(cpu, target) {
+    //stunned
+    if(cpu.stunCounter <= 0) {
+        delete cpu.stunCounter;
+        delete cpu.stunned;
+    }
+    if(cpu.stunCounter > 0) {
+        cpu.stunCounter--;
+        printC(cpu.name + " is stunned and cannot move!");
+        return;
+    }
+
     let x = Object.keys(cpu.actions);
     let y = Math.floor(Math.random() * x.length);
     let z = x[y];
@@ -253,7 +268,7 @@ function autoTurn(player, cpu) {
 function attackIt(attacker, defender) {
     let diceRoll = roll(20);
     printC(attacker.name + " rolled: " + diceRoll);    
-    if(diceRoll + attacker.prof>= defender.AC) {
+    if(diceRoll + mod(attacker.dexterity) >= defender.AC) {
         let dmg = roll(attacker.damage) + attacker.dmgBns;
         defender.HP-=dmg;
         printC(attacker.name + " attacks " + defender.name +"!");
@@ -298,7 +313,7 @@ function multiAttack(attacker, defender, rounds) {
         printC(attacker.name + " attacks twice!")
     }
     for (let i = 0; i < rounds; i++) {
-        if(roll(20) > defender.AC) {
+        if(roll(20) + mod(attacker.dexterity) > defender.AC) {
             dmg+= roll(attacker.damage) + attacker.dmgBns;
             hits++;
         }
@@ -334,8 +349,8 @@ function fireball(attacker, defender) {
     let y = x.indexOf(fireball);
     let z = Object.keys(attacker.actions);
 
-    if(diceRoll + attacker.spellProf >= defender.AC) {
-        let dmg = roll(attacker.spellDmg) + attacker.dmgBns;
+    if(diceRoll + mod(attacker.intelligence) >= defender.AC) {
+        let dmg = roll(10) + mod(attacker.intelligence) + attacker.dmgBns;
         defender.HP-=dmg;
         printC(attacker.name + " casts " + z[y] + " at " + defender.name +"!");
         printC(defender.name + " takes " + dmg + " points of damage!");
@@ -375,11 +390,12 @@ function haste(char) {
         delete char.actions[z[y]];        
     }   
 }
+
 function poisonAttack(attacker, defender) {
-    let diceRoll = roll(20);
     printC(attacker.name + " coats their weapon with poison!");        
+    let diceRoll = roll(20);
     printC(attacker.name + " rolled: " + diceRoll);    
-    if(diceRoll + attacker.prof>= defender.AC) {
+    if(diceRoll + mod(attacker.dexterity) >= defender.AC) {
         let dmg = roll(attacker.damage) + attacker.dmgBns;
         defender.HP-=dmg;
         printC(attacker.name + " attacks " + defender.name +"!");
@@ -395,8 +411,35 @@ function poison(attacker, defender) {
     
     if (diceRoll + mod(defender.constitution) <= 15) {
         defender.debuff = 'poison';
-        defender.poisonCounter = 5 - mod(defender.constitution);
+        defender.poisonCounter = roll(6) - mod(defender.constitution);
         printC(defender.name + " is poisoned!");
+    }
+}
+
+function kick(attacker, defender) {
+    //get list of actions' function names
+    let x = Object.values(attacker.actions);
+    //find index of this function
+    let y = x.indexOf(kick);
+    //get list of actions' keys
+    let z = Object.keys(attacker.actions);
+    //z[y] is attack name!
+    printC(attacker.name + ' uses ' + z[y] + '!');
+
+    attackIt(attacker, defender);
+    stun(attacker, defender);
+
+    //cost of this skill
+    attacker.SP-=1;
+    if(attacker.SP <= 0) {
+        delete attacker.actions[z[y]];        
+    }   
+}
+
+function stun(attacker, defender) {
+    if(roll(20) + mod(attacker.strength) > defender.AC) {
+        defender.stunCounter = roll(4) - mod(defender.constitution);
+        printC(defender.name + " is stunned!");
     }
 }
 
@@ -563,7 +606,7 @@ $(document).ready(function () {
             } else if (game.currentOpponent.HP > 0) {
                 printC(game.currentOpponent.name + " defeated " + game.player.name + '!');
             } else {
-                printC(game.player.name + " and " + game.currentOpponent.name + 'defeated each other!');                
+                printC(game.player.name + " and " + game.currentOpponent.name + ' defeated each other!');                
             }
             let x = $('<button>').attr('id', 'Continue').text('Continue').on("click", function(){
                 a(fx, str);
