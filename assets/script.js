@@ -201,9 +201,8 @@ function turn(char, opponent, act) {
     //stunned
     if(char.stunCounter <= 0) {
         delete char.stunCounter;
-        delete char.stunned;
     }
-    if(char.stunned == true) {
+    if(char.stunCounter > 0) {
         char.stunCounter--;
         printC(char.name + " is stunned and cannot move!");
         return;
@@ -239,7 +238,6 @@ function cpuTurn(cpu, target) {
     //stunned
     if(cpu.stunCounter <= 0) {
         delete cpu.stunCounter;
-        delete cpu.stunned;
     }
     if(cpu.stunCounter > 0) {
         cpu.stunCounter--;
@@ -276,7 +274,7 @@ function autoTurn(player, cpu) {
 }
 
 //basic attack fx
-function attackIt(attacker, defender) {
+function attackIt(attacker, defender, fx, num) {
     let diceRoll = roll(20);
     printC(attacker.name + " rolled: " + diceRoll);    
     if(diceRoll + mod(attacker.dexterity) >= defender.AC) {
@@ -284,6 +282,14 @@ function attackIt(attacker, defender) {
         defender.HP-=dmg;
         printC(attacker.name + " attacks " + defender.name +"!");
         printC(defender.name + " takes " + dmg + " points of damage!");
+								switch(arguments.length) {
+								  case 3:
+										fx(attacker, defender);
+									 break;
+          case 4:
+          fx(attacker, defender, num);
+          break; 
+								}
     } else {
         printC(attacker.name + " attacks " + defender.name + " but misses!");
     }
@@ -418,13 +424,13 @@ function poisonAttack(attacker, defender) {
 }
 function poison(attacker, defender) {
     let diceRoll = roll(20);
-    printC("Poison saving throw: " + diceRoll);
+    printC(defender.name + " rolls a poison saving throw: " + diceRoll + "!");
     
     if (diceRoll + mod(defender.constitution) <= 15) {
         defender.debuff = 'poison';
         defender.poisonCounter = roll(6) - mod(defender.constitution);
         printC(defender.name + " is poisoned!");
-    }
+    } 
 }
 
 function kick(attacker, defender) {
@@ -437,8 +443,7 @@ function kick(attacker, defender) {
     //z[y] is attack name!
     printC(attacker.name + ' uses ' + z[y] + '!');
 
-    attackIt(attacker, defender);
-    stun(attacker, defender);
+    attackIt(attacker, defender, stun);
 
     //cost of this skill
     attacker.SP-=1;
@@ -448,11 +453,9 @@ function kick(attacker, defender) {
 }
 
 function stun(attacker, defender) {
-    if(roll(20) + mod(attacker.strength) > defender.AC) {
-        defender.stunCounter = roll(4) - mod(defender.constitution);
-        console.log("stunCounter: ", defender.stunCounter);
-        printC(defender.name + " is stunned!");
-    }
+    defender.stunCounter = roll(4) - mod(defender.constitution) + mod(attacker.strength);
+    console.log("stunCounter: ", defender.stunCounter);
+    printC(defender.name + " is stunned!");
 }
 
 //game shiz
