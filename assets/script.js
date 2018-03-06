@@ -117,7 +117,7 @@ var charList = {
     },
     char3: {
         name: 'Rogue',
-        HP: 12,
+        HP: 15,
         AC: 15,
         MP: 0,
         SP: 3,
@@ -161,10 +161,21 @@ var charList = {
         imgSrcRight:'./assets/images/char4right.png',
     }
 }
-
+//super important for deep copy! Thanks stack overflow!
 function copy(oldObject) {
     var newObject = jQuery.extend(true, {}, oldObject);
     return newObject;
+}
+function levelUp(char) {
+    char.HP += roll(5) + mod(char.constitution);
+    char.damage++;
+    char.dmgBns += roll(2);
+    char.strength += roll(2) + mod(char.strength);
+    char.dexterity += roll(2) + mod(char.dexterity);
+    char.constitution += roll(2) + mod(char.constitution);
+    char.intelligence += roll(2) + mod(char.intelligence);
+    char.wisdom += roll(2) + mod(char.wisdom);
+    char.charisma += roll(2) + mod(char.charisma);
 }
 
 function debuff(char) {
@@ -439,6 +450,7 @@ function kick(attacker, defender) {
 function stun(attacker, defender) {
     if(roll(20) + mod(attacker.strength) > defender.AC) {
         defender.stunCounter = roll(4) - mod(defender.constitution);
+        console.log("stunCounter: ", defender.stunCounter);
         printC(defender.name + " is stunned!");
     }
 }
@@ -578,6 +590,9 @@ $(document).ready(function () {
                 delete game.chars[defeated];
                 //decrement opponents
                 game.foeCounter--;
+                //levelUp!
+                levelUp(game.playerProto);
+                printC(game.playerProto.name + " leveled up!");
                 //refresh player stats
                 game.player = copy(game.playerProto);
                 //pick next dewd
