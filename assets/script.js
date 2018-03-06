@@ -167,29 +167,30 @@ function copy(oldObject) {
     return newObject;
 }
 function levelUp(char) {
-    char.HP += roll(5) + mod(char.constitution);
+    char.HP += roll(6) + mod(char.constitution);
     char.damage++;
-    char.dmgBns += roll(2);
-    char.strength += roll(2) + mod(char.strength);
-    char.dexterity += roll(2) + mod(char.dexterity);
-    char.constitution += roll(2) + mod(char.constitution);
-    char.intelligence += roll(2) + mod(char.intelligence);
-    char.wisdom += roll(2) + mod(char.wisdom);
-    char.charisma += roll(2) + mod(char.charisma);
+    char.dmgBns += roll(4);
+    char.strength += roll(4) + mod(char.strength);
+    char.dexterity += roll(4) + mod(char.dexterity);
+    char.constitution += roll(4) + mod(char.constitution);
+    char.intelligence += roll(4) + mod(char.intelligence);
+    char.wisdom += roll(4) + mod(char.wisdom);
+    char.charisma += roll(4) + mod(char.charisma);
 }
 
 function debuff(char) {
     switch (char.debuff){
         case 'poison':
-        char.HP-= 2;
-        printC(char.name + " takes 5 pts of poison dmg!");
-        char.poisonCounter--;
-        if(char.poisonCounter < 0) {
-            delete char.poisonCounter;
-            delete char.debuff;
-            printC(char.name + " is no longer poisoned");
-        }
-        break;
+			let psnDmg = roll(6) - mod(char.constitution);
+        	char.HP-= psnDmg;
+        	printC(char.name + " takes " + psnDmg + "pts of poison dmg!");
+        	char.poisonCounter--;
+        	if(char.poisonCounter < 0) {
+            	delete char.poisonCounter;
+            	delete char.debuff;
+            	printC(char.name + " is no longer poisoned");
+        	}
+        break;//end poison case
     }
 }
 
@@ -238,7 +239,7 @@ function cpuTurn(cpu, target) {
     //stunned
     if(cpu.stunCounter <= 0) {
         delete cpu.stunCounter;
-	printC(cpu.name + " is no longer stunned!");
+		printC(cpu.name + " is no longer stunned!");
     }
     if(cpu.stunCounter > 0) {
         cpu.stunCounter--;
@@ -448,9 +449,10 @@ function kick(attacker, defender) {
 function stun(attacker, defender) {
     defender.stunCounter = roll(4) - mod(defender.constitution) + mod(attacker.strength);
 	if(defender.stunCounter > 0) {
-    	printC(defender.name + " is stunned!");
+    		printC(defender.name + " is stunned!");
 	} else {
 		printC(defender.name + " resists stun!");
+		delete defender.stunCounter;
 	}
 }
 
