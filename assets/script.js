@@ -111,6 +111,12 @@ var charList = {
         actions: {
             Attack: attackIt,
             Fireball: fireball,
+			/*
+			function () {
+				charges(player, counterName, charges);
+			}
+			for instance, for channel, then amount of magic missiles to shoot
+			*/
         },
         imgSrcLeft:'./assets/images/char2left.png',
         imgSrcRight:'./assets/images/char2right.png',
@@ -156,6 +162,14 @@ var charList = {
             Punch: attackIt,
             Quick_Fist: doubleAttack,
             Inner_Chi: haste,
+		/* function () {
+			haste(char, rounds);
+		}
+		   function () {
+				charges(player, counterName, charges);
+			}
+			use for focus, then pass that counter into a multistrike attack
+		*/
         },
         imgSrcLeft:'./assets/images/char4left.png',
         imgSrcRight:'./assets/images/char4right.png',
