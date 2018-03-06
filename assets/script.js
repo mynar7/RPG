@@ -238,6 +238,7 @@ function cpuTurn(cpu, target) {
     //stunned
     if(cpu.stunCounter <= 0) {
         delete cpu.stunCounter;
+	printC(cpu.name + " is no longer stunned!");
     }
     if(cpu.stunCounter > 0) {
         cpu.stunCounter--;
@@ -410,27 +411,19 @@ function haste(char) {
 
 function poisonAttack(attacker, defender) {
     printC(attacker.name + " coats their weapon with poison!");        
-    let diceRoll = roll(20);
-    printC(attacker.name + " rolled: " + diceRoll);    
-    if(diceRoll + mod(attacker.dexterity) >= defender.AC) {
-        let dmg = roll(attacker.damage) + attacker.dmgBns;
-        defender.HP-=dmg;
-        printC(attacker.name + " attacks " + defender.name +"!");
-        printC(defender.name + " takes " + dmg + " points of damage!");
-        poison(attacker, defender);
-    } else {
-        printC(attacker.name + " attacks " + defender.name + " but misses!");
-    }
+    attackIt(attacker, defender, poison);
 }
+
 function poison(attacker, defender) {
     let diceRoll = roll(20);
-    printC(defender.name + " rolls a poison saving throw: " + diceRoll + "!");
     
     if (diceRoll + mod(defender.constitution) <= 15) {
         defender.debuff = 'poison';
         defender.poisonCounter = roll(6) - mod(defender.constitution);
         printC(defender.name + " is poisoned!");
-    } 
+    } else {
+		printC(defender.name + " resists the poison!");
+	}
 }
 
 function kick(attacker, defender) {
@@ -454,8 +447,11 @@ function kick(attacker, defender) {
 
 function stun(attacker, defender) {
     defender.stunCounter = roll(4) - mod(defender.constitution) + mod(attacker.strength);
-    console.log("stunCounter: ", defender.stunCounter);
-    printC(defender.name + " is stunned!");
+	if(defender.stunCounter > 0) {
+    	printC(defender.name + " is stunned!");
+	} else {
+		printC(defender.name + " resists stun!");
+	}
 }
 
 //game shiz
