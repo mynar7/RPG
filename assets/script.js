@@ -99,7 +99,7 @@ var charList = {
         HP: 27,
         AC: 13,
         MP: 4,
-        SP: 0,
+        SP: 1,
         damage: 3, //+3. but 1d10 flat with fireball
         dmgBns: 2,
         strength: 10,
@@ -508,12 +508,12 @@ $(document).ready(function () {
            
 		//make a copy of player object so player can be reset after battle
             game.player = copy(game.chars[y]);
-            game.playerProto = copy(game.chars[y]);
             //get data for player stat bars
-            game.playerProto.maxHP = game.playerProto.HP;
-            game.playerProto.maxMP = game.playerProto.MP;
-            game.playerProto.maxSP = game.playerProto.SP;
+            game.player.maxHP = game.player.HP;
+            game.player.maxMP = game.player.MP;
+            game.player.maxSP = game.player.SP;
             
+            game.playerProto = copy(game.player);
             
             //remove player from list of chars
             delete game.chars[y];
@@ -587,14 +587,14 @@ $(document).ready(function () {
                 .appendTo('#enemyDiv');
             //add hp bars!
             $('<h2>').attr("id", "enemyHP").attr("class", "enemyHP").appendTo('#enemyDiv');
-			$('<h3>').attr("id", "enemyHPnum").attr("class", "enemyHPnum").text('HP: ' + game.currentOpponent.HP + game.currentOpponent.maxHP).appendTo('#enemyDiv');
+			$('<h3>').attr("id", "enemyHPnum").attr("class", "enemyHPnum").text('HP: ' + game.currentOpponent.HP + '/' +game.currentOpponent.maxHP).appendTo('#enemyDiv');
             if(game.currentOpponent.MP > 0) {
                 $('<h2>').attr("id", "enemyMP").attr("class", "enemyMP").appendTo('#enemyDiv');
-				$('<h3>').attr("id", "enemyMPnum").attr("class", "enemyMPnum").text('MP: ' + game.currentOpponent.MP + game.currentOpponent.maxMP).appendTo('#enemyDiv');
+				$('<h3>').attr("id", "enemyMPnum").attr("class", "enemyMPnum").text('MP: ' + game.currentOpponent.MP + '/' + game.currentOpponent.maxMP).appendTo('#enemyDiv');
             }
             if(game.currentOpponent.SP > 0) {
                 $('<h2>').attr("id", "enemySP").attr("class", "enemySP").appendTo('#enemyDiv');
-				$('<h3>').attr("id", "enemySPnum").attr("class", "enemySPnum").text('SP: ' + game.currentOpponent.SP + game.currentOpponent.maxSP).appendTo('#enemyDiv');
+				$('<h3>').attr("id", "enemySPnum").attr("class", "enemySPnum").text('SP: ' + game.currentOpponent.SP +  '/' +game.currentOpponent.maxSP).appendTo('#enemyDiv');
             }
             //remove enemy pics
             $('#enemies').remove();

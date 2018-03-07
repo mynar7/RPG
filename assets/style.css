@@ -68,11 +68,20 @@ body {
 .enemyDiv {
     float: right;
 }
+
+.enemyDiv>h3 {
+    clear: both;
+    position: relative;
+    text-align: center;
+    bottom: 18px;
+}
+
 .enemyDiv>h2 {
     clear: both;
     text-align: right;
     float: right;
     width: 100%;
+    height: 20px;
     border-radius: 0px 15px;
     color: white;
 }
@@ -98,11 +107,18 @@ body {
 .playerDiv, .playerDiv>h2 {
     float: left;
 }
+.playerDiv>h3 {
+    clear:both;
+    position: relative;
+    text-align: center;
+    bottom: 18px;
+}
 
 .playerDiv>h2 {
     clear: both;
     width: 100%;
     float: left;
+    height: 20px;    
     text-align: left;
     border-radius: 15px 0px;
     padding: 0 1px;
