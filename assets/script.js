@@ -127,8 +127,8 @@ var charList = {
         AC: 15,
         MP: 0,
         SP: 5,
-        damage: 7, //+3? 
-        dmgBns: 3,
+        damage: 4, //+3? 
+        dmgBns: 4,
         strength: 8,
         dexterity: 16,
         constitution: 10,
@@ -150,8 +150,8 @@ var charList = {
         AC: 10,
         MP: 0,
         SP: 5,
-        damage: 2,
-        dmgBns: 2,
+        damage: 4,
+        dmgBns: 3,
         strength: 8,
         dexterity: 17,
         constitution: 14,
@@ -161,11 +161,7 @@ var charList = {
         actions: {
             Punch: attackIt,
             Quick_Fist: doubleAttack,
-            Inner_Chi: 
-			function () {
-				charge(attacker, "punches", 3);
-			},
-			
+            Inner_Chi: haste,
         },
         imgSrcLeft:'./assets/images/char4left.png',
         imgSrcRight:'./assets/images/char4right.png',
@@ -293,11 +289,7 @@ function autoTurn(player, cpu) {
     printC(player.name + ' has ' + player.HP + 'HP left');
     printC(cpu.name + ' has ' + cpu.HP + 'HP left');
 }
-//charges fx
-function charges(char, num, counterName) {
-	char[counterName] = num;
-	console.log("yay", char[counterName]);
-}
+
 //basic attack fx
 function attackIt(attacker, defender, fx, num) { 
     if(roll(20) + mod(attacker.dexterity) >= defender.AC) {
