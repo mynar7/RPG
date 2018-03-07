@@ -5,6 +5,7 @@ body {
 }
 
 .combatText {
+    clear:both;
     height: 300px;
     overflow: auto;
     display: flex;
@@ -18,12 +19,30 @@ body {
 #playerIntro {
     float: left;
 }
-
-.currentOpponent {
+/* contains battle opponent */
+.enemyDiv {
     float: right;
 }
+.playerHP, .enemyHP {
+    background-color: rgb(62, 214, 62);
+}
+.playerHP, .enemyMP {
+    background-color: rgb(182, 24, 182);
+}
+.playerSP, .enemySP {
+    background-color: rgb(52, 173, 189);
+}
+/* contains player during battle */
+.playerDiv {
+    float: left;
+}
+
 .foeStoryPic {
     float: right;
+}
+/* battle and story pg btn container */
+.actionBtns {
+    clear: both;
 }
 
 @media screen and (max-width: 401px) {

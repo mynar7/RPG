@@ -509,8 +509,13 @@ $(document).ready(function () {
         playerChoose: function (x) {
             let y = $(x).attr("id");
             //make property for player obj
-            game.player = copy(game.chars[y]);
             game.playerProto = copy(game.chars[y]);
+            //get data for player stat bars
+            game.playerProto.maxHP = game.playerProto.HP;
+            game.playerProto.maxMP = game.playerProto.MP;
+            game.playerProto.maxSP = game.playerProto.SP;
+            //make a copy of player object so player can be reset after battle
+            game.player = copy(game.playerProto);
             //remove player from list of chars
             delete game.chars[y];
 
@@ -527,10 +532,19 @@ $(document).ready(function () {
             $('body').append(
                 $('<div>').attr("id", "charPics").attr("class", "charPics")
             );//end append
-            $('#charPics').append($('<img>')
+            //create player image and stats
+            $('<div>').attr("id", "playerDiv").attr("class", "playerDiv").appendTo('#charPics');
+            $('#playerDiv').append($('<img>')
                             .attr("src", game.player.imgSrcRight)
                             .attr("id", "player")
             );//end append
+            $('<h2>').attr("id", "playerHP").attr("class", "playerHP").text('HP').appendTo('#playerDiv');
+            if(game.player.MP > 0) {
+                $('<h2>').attr("id", "playerMP").attr("class", "playerMP").text('MP').appendTo('#playerDiv');
+            }
+            if(game.player.SP > 0) {
+                $('<h2>').attr("id", "playerSP").attr("class", "playerSP").text('SP').appendTo('#playerDiv');
+            }
             $('body').append($('<h1>')
                         .attr("class", "instr")
                         .attr("id", "instr")
@@ -556,13 +570,26 @@ $(document).ready(function () {
             //x is the pic, use the id
             let enemy = $(x).attr("id");
             game.currentOpponent = copy(game.chars[enemy]);
-    
+            //get data for enemy healthbars
+            game.currentOpponent.maxHP = game.currentOpponent.HP;
+            game.currentOpponent.maxMP = game.currentOpponent.MP;
+            game.currentOpponent.maxSP = game.currentOpponent.SP;
+            
+            //make div for opponent
+            $('<div>').attr("id", "enemyDiv").attr("class", "enemyDiv").appendTo('#charPics');
             //add pic of enemy to right of player
-            let y = $('<img>')
-                    .attr("src", game.currentOpponent.imgSrcLeft)
-                    .attr("class", "currentOpponent")
-                    .attr("id", enemy);
-            $('#charPics').append(y);
+            $('<img>').attr("src", game.currentOpponent.imgSrcLeft)
+                .attr("class", "currentOpponent")
+                .attr("id", enemy)
+                .appendTo('#enemyDiv');
+            //add hp bars!
+            $('<h2>').attr("id", "enemyHP").attr("class", "enemyHP").text('HP').appendTo('#enemyDiv');
+            if(game.currentOpponent.MP > 0) {
+                $('<h2>').attr("id", "enemyMP").attr("class", "enemyMP").text('MP').appendTo('#enemyDiv');
+            }
+            if(game.currentOpponent.SP > 0) {
+                $('<h2>').attr("id", "enemySP").attr("class", "enemySP").text('SP').appendTo('#enemyDiv');
+            }
             //remove enemy pics
             $('#enemies').remove();
             $('#instr').remove();
@@ -584,6 +611,7 @@ $(document).ready(function () {
                 $(btn).on("click", function(){
                     //do combat with selected action!
                     turn(game.player, game.currentOpponent, $(this).text());
+                    game.updateStatBars();
                     //check if you're dead, then do it again!
                     game.gameLogic();
                     });
@@ -592,6 +620,59 @@ $(document).ready(function () {
             
         },//end drawButtons
 
+        //make awesome stat bars!
+        updateStatBars: function() {
+            //update player bars
+            //if HP is negative, don't make a neg bar!
+            if(game.player.HP <= 0){
+                $('#playerHP').css("width", 0);                
+            } else {
+                $('#playerHP').css("width", game.player.HP / game.player.maxHP * 100);
+            }
+            //if no MP, don't bother
+            if(game.player.maxMP > 0){
+                if(game.player.MP > 0){
+                    $('#playerMP').css("width", game.player.MP / game.player.maxMP * 100);
+                } else {
+                    $('#playerHP').css("width", 0);          
+                }
+            }//end drawing MP
+            //if no SP, don't bother            
+            if(game.player.maxSP > 0){
+                if(game.player.SP > 0){
+                    $('#playerSP').css("width", game.player.SP / game.player.maxSP * 100);
+                } else {
+                    $('#playerSP').css("width", 0);          
+                }
+            }//end drawing SP
+
+
+            //update enemy bars!
+            //if HP is negative, don't make a neg bar!
+            if(game.currentOpponent.HP <= 0){
+                $('#enemyHP').css("width", 0);                
+            } else {
+                $('#enemyHP').css("width", game.currentOpponent.HP / game.currentOpponent.maxHP * 100);
+            }
+            //if no MP, don't bother
+            if(game.currentOpponent.maxMP > 0){
+                if(game.currentOpponent.MP > 0){
+                    $('#enemyMP').css("width", game.currentOpponent.MP / game.currentOpponent.maxMP * 100);
+                } else {
+                    $('#enemyHP').css("width", 0);          
+                }
+            }//end drawing MP
+            //if no SP, don't bother            
+            if(game.currentOpponent.maxSP > 0){
+                if(game.currentOpponent.SP > 0){
+                    $('#enemySP').css("width", game.currentOpponent.SP / game.currentOpponent.maxSP * 100);
+                } else {
+                    $('#enemySP').css("width", 0);          
+                }
+            }//end drawing SP
+        }, //end update bars!
+
+        //handle win/loss
         gameLogic: function() {
             if(game.player.HP > 0) {
                 game.drawButtons();
@@ -608,6 +689,13 @@ $(document).ready(function () {
                 game.foeCounter--;
                 //levelUp!
                 levelUp(game.playerProto);
+                //update data for stat bars
+                game.playerProto.maxHP = game.playerProto.HP;
+                game.playerProto.maxMP = game.playerProto.MP;
+                game.playerProto.maxSP = game.playerProto.SP;
+                //refresh/heal player
+                game.player = copy(game.playerProto);
+                //nice!
                 printC(game.playerProto.name + " leveled up!");
                 //refresh player stats
                 game.player = copy(game.playerProto);
