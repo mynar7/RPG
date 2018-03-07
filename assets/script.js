@@ -161,10 +161,10 @@ var charList = {
         actions: {
             Punch: attackIt,
             Quick_Fist: doubleAttack,
-            Inner_Chi: haste,
-			Charge: function () {
+            Inner_Chi: 
+			function () {
 				charge(attacker, "punches", 3);
-			}
+			},
 			
         },
         imgSrcLeft:'./assets/images/char4left.png',
