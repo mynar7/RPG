@@ -538,12 +538,15 @@ $(document).ready(function () {
                             .attr("id", "player")
                             .attr('class', 'playerBattlePic')
             );//end append
-            $('<h2>').attr("id", "playerHP").attr("class", "playerHP").text('HP').appendTo('#playerDiv');
+            $('<h2>').attr("id", "playerHP").attr("class", "playerHP").appendTo('#playerDiv');
+			$('<h3>').attr("id", "playerHPnum").attr("class", "playerHPnum").text('HP: ' + game.player.HP + '/' + game.player.maxHP).appendTo('#playerDiv');
             if(game.player.MP > 0) {
-                $('<h2>').attr("id", "playerMP").attr("class", "playerMP").text('MP').appendTo('#playerDiv');
+                $('<h2>').attr("id", "playerMP").attr("class", "playerMP").appendTo('#playerDiv');
+				$('<h3>').attr("id", "playerMPnum").attr("class", "playerMPnum").text('MP: ' + game.player.MP + '/' + game.player.maxMP).appendTo('#playerDiv');
             }
             if(game.player.SP > 0) {
-                $('<h2>').attr("id", "playerSP").attr("class", "playerSP").text('SP').appendTo('#playerDiv');
+                $('<h2>').attr("id", "playerSP").attr("class", "playerSP").appendTo('#playerDiv');
+				$('<h3>').attr("id", "playerSPnum").attr("class", "playerSPnum").text('SP: ' + game.player.SP + '/' + game.player.maxSP).appendTo('#playerDiv');
             }
             $('body').append($('<h1>')
                         .attr("class", "instr")
@@ -583,12 +586,15 @@ $(document).ready(function () {
                 .attr("id", enemy)
                 .appendTo('#enemyDiv');
             //add hp bars!
-            $('<h2>').attr("id", "enemyHP").attr("class", "enemyHP").text('HP').appendTo('#enemyDiv');
+            $('<h2>').attr("id", "enemyHP").attr("class", "enemyHP").appendTo('#enemyDiv');
+			$('<h3>').attr("id", "enemyHPnum").attr("class", "enemyHPnum").text('HP: ' + game.currentOpponent.HP + game.currentOpponent.maxHP).appendTo('#enemyDiv');
             if(game.currentOpponent.MP > 0) {
-                $('<h2>').attr("id", "enemyMP").attr("class", "enemyMP").text('MP').appendTo('#enemyDiv');
+                $('<h2>').attr("id", "enemyMP").attr("class", "enemyMP").appendTo('#enemyDiv');
+				$('<h3>').attr("id", "enemyMPnum").attr("class", "enemyMPnum").text('MP: ' + game.currentOpponent.MP + game.currentOpponent.maxMP).appendTo('#enemyDiv');
             }
             if(game.currentOpponent.SP > 0) {
-                $('<h2>').attr("id", "enemySP").attr("class", "enemySP").text('SP').appendTo('#enemyDiv');
+                $('<h2>').attr("id", "enemySP").attr("class", "enemySP").appendTo('#enemyDiv');
+				$('<h3>').attr("id", "enemySPnum").attr("class", "enemySPnum").text('SP: ' + game.currentOpponent.SP + game.currentOpponent.maxSP).appendTo('#enemyDiv');
             }
             //remove enemy pics
             $('#enemies').remove();
@@ -626,26 +632,30 @@ $(document).ready(function () {
             //if HP is negative, don't make a neg bar!
         
             if(game.player.HP <= 0){
-                $('#playerHP').animate({"width": 0});                
+				$('#playerHPnum').text('HP: 0/' + game.player.maxHP);
+                $('#playerHP').animate({"width": 0});
             } else {
+				$('#playerHPnum').text('HP: ' + game.player.HP + '/' + game.player.maxHP);
                 $('#playerHP').animate({"width": game.player.HP / game.player.maxHP * 100 + '%'});
             }
             //if no MP, don't bother
             if(game.player.maxMP > 0){
-                
                 if(game.player.MP > 0){
+					$('#playerMPnum').text('MP: ' + game.player.MP + '/' + game.player.maxMP);
                     $('#playerMP').animate({"width": game.player.MP / game.player.maxMP * 100 + '%'});
                 } else {
-                    $('#playerMP').animate({"width": 0});          
+					$('#playerMPnum').text('MP: 0/' + game.player.maxMP);
+                    $('#playerMP').animate({"width": 0});
                 }
             }//end drawing MP
             //if no SP, don't bother            
             if(game.player.maxSP > 0){
-                
                 if(game.player.SP > 0){
+					$('#playerSPnum').text('SP: ' + game.player.SP + '/' + game.player.maxSP);
                     $('#playerSP').animate({"width": game.player.SP / game.player.maxSP * 100 + '%'});
                 } else {
-                    $('#playerSP').animate({"width": 0});          
+					$('#playerSPnum').text('SP: 0/' + game.player.maxSP);
+                    $('#playerSP').animate({"width": 0});
                 }
             }//end drawing SP
 
@@ -654,26 +664,31 @@ $(document).ready(function () {
            
             //if HP is negative, don't make a neg bar!
             if(game.currentOpponent.HP <= 0){
-                $('#enemyHP').text('').animate({"width": 0});                
+				$('#enemyHPnum').text('HP: 0/' + game.currentOpponent.maxHP);
+                $('#enemyHP').animate({"width": 0});
             } else {
+				$('#enemyHPnum').text('HP: ' + game.currentOpponent.HP + '/' + game.currentOpponent.maxHP)
                 $('#enemyHP').animate({"width": game.currentOpponent.HP / game.currentOpponent.maxHP * 100 + '%'});
             }
             //if no MP, don't bother
             if(game.currentOpponent.maxMP > 0){
-               
                 if(game.currentOpponent.MP > 0){
+					$('#enemyMPnum').text('MP: ' + game.currentOpponent.MP + '/' + game.currentOpponent.maxMP)
                     $('#enemyMP').animate({"width": game.currentOpponent.MP / game.currentOpponent.maxMP * 100 + '%'});
                 } else {
-                    $('#enemyMP').text('').animate({"width": 0});          
+					$('#enemyMPnum').text('MP: 0/' + game.currentOpponent.maxMP);
+                    $('#enemyMP').animate({"width": 0});          
                 }
             }//end drawing MP
             //if no SP, don't bother            
             if(game.currentOpponent.maxSP > 0){
                 
                 if(game.currentOpponent.SP > 0){
+					$('#enemySPnum').text('SP: ' + game.currentOpponent.SP + '/' + game.currentOpponent.maxSP)
                     $('#enemySP').animate({"width": game.currentOpponent.SP / game.currentOpponent.maxSP * 100 + '%'});
                 } else {
-                    $('#enemySP').text('').animate({"width": 0});          
+                    $('#enemySP').text('').animate({"width": 0});
+					$('#enemySPnum').text('SP: 0/' + game.currentOpponent.maxSP);
                 }
             }//end drawing SP
         }, //end update bars!
