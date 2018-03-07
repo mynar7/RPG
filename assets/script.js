@@ -99,7 +99,7 @@ var charList = {
         HP: 17,
         AC: 13,
         MP: 2,
-        SP: 4,
+        SP: 0,
         damage: 3, //+3. but 1d10 flat with fireball
         dmgBns: 2,
         strength: 10,
@@ -625,24 +625,24 @@ $(document).ready(function () {
             //update player bars
             //if HP is negative, don't make a neg bar!
             if(game.player.HP <= 0){
-                $('#playerHP').css("width", 0);                
+                $('#playerHP').animate({"width": 0});                
             } else {
-                $('#playerHP').css("width", game.player.HP / game.player.maxHP * 100);
+                $('#playerHP').animate({"width": game.player.HP / game.player.maxHP * 100 + '%'});
             }
             //if no MP, don't bother
             if(game.player.maxMP > 0){
                 if(game.player.MP > 0){
-                    $('#playerMP').css("width", game.player.MP / game.player.maxMP * 100);
+                    $('#playerMP').animate({"width": game.player.MP / game.player.maxMP * 100 + '%'});
                 } else {
-                    $('#playerHP').css("width", 0);          
+                    $('#playerMP').animate({"width": 0});          
                 }
             }//end drawing MP
             //if no SP, don't bother            
             if(game.player.maxSP > 0){
                 if(game.player.SP > 0){
-                    $('#playerSP').css("width", game.player.SP / game.player.maxSP * 100);
+                    $('#playerSP').animate({"width": game.player.SP / game.player.maxSP * 100 + '%'});
                 } else {
-                    $('#playerSP').css("width", 0);          
+                    $('#playerSP').animate({"width": 0});          
                 }
             }//end drawing SP
 
@@ -650,22 +650,22 @@ $(document).ready(function () {
             //update enemy bars!
             //if HP is negative, don't make a neg bar!
             if(game.currentOpponent.HP <= 0){
-                $('#enemyHP').css("width", 0);                
+                $('#enemyHP').animate({"width": 0});                
             } else {
-                $('#enemyHP').css("width", game.currentOpponent.HP / game.currentOpponent.maxHP * 100);
+                $('#enemyHP').animate({"width": game.currentOpponent.HP / game.currentOpponent.maxHP * 100 + '%'});
             }
             //if no MP, don't bother
             if(game.currentOpponent.maxMP > 0){
                 if(game.currentOpponent.MP > 0){
-                    $('#enemyMP').css("width", game.currentOpponent.MP / game.currentOpponent.maxMP * 100);
+                    $('#enemyMP').animate({"width": game.currentOpponent.MP / game.currentOpponent.maxMP * 100 + '%'});
                 } else {
-                    $('#enemyHP').css("width", 0);          
+                    $('#enemyMP').animate({"width": 0});          
                 }
             }//end drawing MP
             //if no SP, don't bother            
             if(game.currentOpponent.maxSP > 0){
                 if(game.currentOpponent.SP > 0){
-                    $('#enemySP').css("width", game.currentOpponent.SP / game.currentOpponent.maxSP * 100);
+                    $('#enemySP').css("width", game.currentOpponent.SP / game.currentOpponent.maxSP * 100 + '%');
                 } else {
                     $('#enemySP').css("width", 0);          
                 }
