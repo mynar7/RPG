@@ -74,10 +74,10 @@ function mod(score) {
 var charList = {
     char1: {
         name: 'Knight',
-        HP: 22,
+        HP: 32,
         AC: 13,
         MP: 0,
-        SP: 2,
+        SP: 3,
         damage: 8,
         dmgBns: 3,
         strength: 16,
@@ -96,9 +96,9 @@ var charList = {
 
     char2: {
         name: 'Sorcerer',
-        HP: 17,
+        HP: 27,
         AC: 13,
-        MP: 2,
+        MP: 4,
         SP: 0,
         damage: 3, //+3. but 1d10 flat with fireball
         dmgBns: 2,
@@ -123,10 +123,10 @@ var charList = {
     },
     char3: {
         name: 'Rogue',
-        HP: 15,
+        HP: 25,
         AC: 15,
         MP: 0,
-        SP: 3,
+        SP: 5,
         damage: 7, //+3? 
         dmgBns: 3,
         strength: 8,
@@ -146,10 +146,10 @@ var charList = {
 
     char4: {
         name: 'Monk',
-        HP: 30,
+        HP: 40,
         AC: 10,
         MP: 0,
-        SP: 3,
+        SP: 5,
         damage: 2,
         dmgBns: 2,
         strength: 8,
@@ -650,7 +650,7 @@ $(document).ready(function () {
             //update enemy bars!
             //if HP is negative, don't make a neg bar!
             if(game.currentOpponent.HP <= 0){
-                $('#enemyHP').animate({"width": 0});                
+                $('#enemyHP').text('').animate({"width": 0});                
             } else {
                 $('#enemyHP').animate({"width": game.currentOpponent.HP / game.currentOpponent.maxHP * 100 + '%'});
             }
@@ -659,15 +659,15 @@ $(document).ready(function () {
                 if(game.currentOpponent.MP > 0){
                     $('#enemyMP').animate({"width": game.currentOpponent.MP / game.currentOpponent.maxMP * 100 + '%'});
                 } else {
-                    $('#enemyMP').animate({"width": 0});          
+                    $('#enemyMP').text('').animate({"width": 0});          
                 }
             }//end drawing MP
             //if no SP, don't bother            
             if(game.currentOpponent.maxSP > 0){
                 if(game.currentOpponent.SP > 0){
-                    $('#enemySP').css("width", game.currentOpponent.SP / game.currentOpponent.maxSP * 100 + '%');
+                    $('#enemySP').animate({"width": game.currentOpponent.SP / game.currentOpponent.maxSP * 100 + '%'});
                 } else {
-                    $('#enemySP').css("width", 0);          
+                    $('#enemySP').text('').animate({"width": 0});          
                 }
             }//end drawing SP
         }, //end update bars!
