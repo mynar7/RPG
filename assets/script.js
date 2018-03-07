@@ -162,14 +162,10 @@ var charList = {
             Punch: attackIt,
             Quick_Fist: doubleAttack,
             Inner_Chi: haste,
-		/* function () {
-			haste(char, rounds);
-		}
-		   function () {
-				charges(player, counterName, charges);
+			Charge: function () {
+				charge(attacker, "punches", 3);
 			}
-			use for focus, then pass that counter into a multistrike attack
-		*/
+			
         },
         imgSrcLeft:'./assets/images/char4left.png',
         imgSrcRight:'./assets/images/char4right.png',
@@ -297,7 +293,11 @@ function autoTurn(player, cpu) {
     printC(player.name + ' has ' + player.HP + 'HP left');
     printC(cpu.name + ' has ' + cpu.HP + 'HP left');
 }
-
+//charges fx
+function charges(char, num, counterName) {
+	char[counterName] = num;
+	console.log("yay", char[counterName]);
+}
 //basic attack fx
 function attackIt(attacker, defender, fx, num) { 
     if(roll(20) + mod(attacker.dexterity) >= defender.AC) {
@@ -305,13 +305,13 @@ function attackIt(attacker, defender, fx, num) {
         defender.HP-=dmg;
         printC(attacker.name + " attacks " + defender.name +"!");
         printC(defender.name + " takes " + dmg + " points of damage!");
-								switch(arguments.length) {
-								  case 3:
-										fx(attacker, defender);
-									 break;
-          case 4:
-          fx(attacker, defender, num);
-          break; 
+		switch(arguments.length) {
+			case 3:
+				fx(attacker, defender);
+			break;
+			case 4;
+				fx(attacker, defender, num);
+			break; 
 								}
     } else {
         printC(attacker.name + " attacks " + defender.name + " but misses!");
