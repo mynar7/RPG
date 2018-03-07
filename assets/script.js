@@ -520,7 +520,7 @@ $(document).ready(function () {
             game.playerProto.maxMP = game.playerProto.MP;
             game.playerProto.maxSP = game.playerProto.SP;
             //make a copy of player object so player can be reset after battle
-            game.player = copy(game.playerProto);
+            game.player = copy(game.chars[y]);
             //remove player from list of chars
             delete game.chars[y];
 
