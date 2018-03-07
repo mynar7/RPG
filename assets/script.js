@@ -75,11 +75,11 @@ var charList = {
     char1: {
         name: 'Knight',
         HP: 32,
-        AC: 13,
+        AC: 11,
         MP: 0,
-        SP: 3,
-        damage: 8,
-        dmgBns: 3,
+        SP: 4,
+        damage: 6,
+        dmgBns: 4,
         strength: 16,
         dexterity: 9,
         constitution: 15,
@@ -181,9 +181,14 @@ function copy(oldObject) {
     return newObject;
 }
 function levelUp(char) {
-    char.HP += roll(6) + mod(char.constitution);
+    char.HP += roll(4);
+    if(char.MP > 0) {
+        char.MP++;
+    }
+    if(char.SP > 0) {
+        char.SP++;
+    }
     char.damage++;
-    char.dmgBns++;
     char.strength += roll(4) + mod(char.strength);
     char.dexterity += roll(4) + mod(char.dexterity);
     char.constitution += roll(4) + mod(char.constitution);
@@ -537,6 +542,7 @@ $(document).ready(function () {
             $('#playerDiv').append($('<img>')
                             .attr("src", game.player.imgSrcRight)
                             .attr("id", "player")
+                            .attr('class', 'playerBattlePic')
             );//end append
             $('<h2>').attr("id", "playerHP").attr("class", "playerHP").text('HP').appendTo('#playerDiv');
             if(game.player.MP > 0) {
@@ -579,7 +585,7 @@ $(document).ready(function () {
             $('<div>').attr("id", "enemyDiv").attr("class", "enemyDiv").appendTo('#charPics');
             //add pic of enemy to right of player
             $('<img>').attr("src", game.currentOpponent.imgSrcLeft)
-                .attr("class", "currentOpponent")
+                .attr("class", "enemyBattlePic")
                 .attr("id", enemy)
                 .appendTo('#enemyDiv');
             //add hp bars!
@@ -624,6 +630,7 @@ $(document).ready(function () {
         updateStatBars: function() {
             //update player bars
             //if HP is negative, don't make a neg bar!
+        
             if(game.player.HP <= 0){
                 $('#playerHP').animate({"width": 0});                
             } else {
@@ -631,6 +638,7 @@ $(document).ready(function () {
             }
             //if no MP, don't bother
             if(game.player.maxMP > 0){
+                
                 if(game.player.MP > 0){
                     $('#playerMP').animate({"width": game.player.MP / game.player.maxMP * 100 + '%'});
                 } else {
@@ -639,6 +647,7 @@ $(document).ready(function () {
             }//end drawing MP
             //if no SP, don't bother            
             if(game.player.maxSP > 0){
+                
                 if(game.player.SP > 0){
                     $('#playerSP').animate({"width": game.player.SP / game.player.maxSP * 100 + '%'});
                 } else {
@@ -648,6 +657,7 @@ $(document).ready(function () {
 
 
             //update enemy bars!
+           
             //if HP is negative, don't make a neg bar!
             if(game.currentOpponent.HP <= 0){
                 $('#enemyHP').text('').animate({"width": 0});                
@@ -656,6 +666,7 @@ $(document).ready(function () {
             }
             //if no MP, don't bother
             if(game.currentOpponent.maxMP > 0){
+               
                 if(game.currentOpponent.MP > 0){
                     $('#enemyMP').animate({"width": game.currentOpponent.MP / game.currentOpponent.maxMP * 100 + '%'});
                 } else {
@@ -664,6 +675,7 @@ $(document).ready(function () {
             }//end drawing MP
             //if no SP, don't bother            
             if(game.currentOpponent.maxSP > 0){
+                
                 if(game.currentOpponent.SP > 0){
                     $('#enemySP').animate({"width": game.currentOpponent.SP / game.currentOpponent.maxSP * 100 + '%'});
                 } else {
@@ -683,7 +695,7 @@ $(document).ready(function () {
             //if you win a battle, this
             } else if(game.currentOpponent.HP <= 0) {
                 //delete this char from opponents
-                let defeated = $('.currentOpponent').attr("id");
+                let defeated = $('.enemyBattlePic').attr("id");
                 delete game.chars[defeated];
                 //decrement opponents
                 game.foeCounter--;
@@ -738,10 +750,12 @@ $(document).ready(function () {
         storyPage: function (fx, str) {
             //this chunk draws player in left corner with text
             $('body').empty();
+            /*
             let a = $('<div>');
             a.attr("id", "charPics").attr("class", "charPics");
             $('body').append(a);
-            $('#charPics').append($('<img>')
+            */
+            $('body').append($('<img>')
                             .attr("src", game.player.imgSrcRight)
                             .attr("id", "player")
                         );//end append
@@ -757,12 +771,14 @@ $(document).ready(function () {
         }, //end storyPage
 
         storyPageFoe: function (fx, str) {
-            //this chunk draws player in left corner with text
             $('body').empty();
+            //this chunk draws player in left corner with text
+            /*
             let a = $('<div>');
             a.attr("id", "charPics").attr("class", "charPics");
             $('body').append(a);
-            $('#charPics').append($('<img>')
+            */
+            $('body').append($('<img>')
                             .attr("class", 'foeStoryPic')
                             .attr("src", game.currentOpponent.imgSrcLeft)                            
                         );//end append

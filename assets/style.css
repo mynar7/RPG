@@ -2,6 +2,7 @@ body {
     font-family: arial;
     margin: auto;
     max-width: 960px;
+    background-image: url(./images/floatingCastle.jpg);
 }
 /* start btn */
 .start {
@@ -11,17 +12,22 @@ body {
 .instr {
     text-align: center;
 }
+.charPics {
+    background-color: rgba(88, 89, 93, 0.609);
+    height: 350px;
+}
 .combatText {
+    background-image: url('./images/rockywall.png');
     clear:both;
     height: 300px;
-    border: 10px gray ridge;
-    background-color: gray;
+    border: 10px rgb(224, 224, 224) ridge;
     /* makes the scroll bar stay at the bottom */
     overflow: auto;
     display: flex;
     flex-direction: column-reverse;
 }
 .charSelDiv {
+    
     /* center imgs in this div */
     display: flex;
     align-items: center;
@@ -38,6 +44,7 @@ body {
 }
 .enemies {
     clear: both;
+    background-color: rgb(88, 89, 93);
     /* center imgs in this div */
     display: flex;
     align-items: center;
@@ -56,6 +63,7 @@ body {
 #playerIntro {
     float: left;
 }
+
 /* contains battle opponent */
 .enemyDiv {
     float: right;
@@ -65,6 +73,8 @@ body {
     text-align: right;
     float: right;
     width: 100%;
+    border-radius: 0px 15px;
+    color: white;
 }
 
 .enemyDiv>img {
@@ -85,10 +95,21 @@ body {
     background-color: rgb(52, 173, 189);
 }
 /* contains player during battle */
-.playerDiv {
+.playerDiv, .playerDiv>h2 {
     float: left;
 }
+
+.playerDiv>h2 {
+    clear: both;
+    width: 100%;
+    float: left;
+    text-align: left;
+    border-radius: 15px 0px;
+    padding: 0 1px;
+    color: white;
+}
 .playerDiv>img {
+    float:left;
     border-bottom: 10px rgb(88, 89, 93) ridge;
     border-bottom-right-radius: 15px;
     border-bottom-left-radius: 0px;
@@ -109,8 +130,8 @@ body {
 }
 
 @media screen and (max-width: 401px) {
-    .charPics>img {
-        width: 170px;
+    .playerBattlePic, .enemyBattlePic {
+        width: 150px;
         height: 100%;
     }
     /* heh */
