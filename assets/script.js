@@ -301,7 +301,7 @@ function attackIt(attacker, defender, fx, num) {
 			case 3:
 				fx(attacker, defender);
 			break;
-			case 4;
+			case 4:
 				fx(attacker, defender, num);
 			break; 
 								}
