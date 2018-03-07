@@ -513,14 +513,16 @@ $(document).ready(function () {
         //after choosing a char, this fx sets up text to explain that char has to fight others
         playerChoose: function (x) {
             let y = $(x).attr("id");
-            //make property for player obj
+           
+		//make a copy of player object so player can be reset after battle
+            game.player = copy(game.chars[y]);
             game.playerProto = copy(game.chars[y]);
             //get data for player stat bars
             game.playerProto.maxHP = game.playerProto.HP;
             game.playerProto.maxMP = game.playerProto.MP;
             game.playerProto.maxSP = game.playerProto.SP;
-            //make a copy of player object so player can be reset after battle
-            game.player = copy(game.chars[y]);
+            
+            
             //remove player from list of chars
             delete game.chars[y];
 
