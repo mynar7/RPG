@@ -180,6 +180,17 @@ function copy(oldObject) {
     var newObject = jQuery.extend(true, {}, oldObject);
     return newObject;
 }
+
+function getActionName(char) {
+    //get list of actions' function names
+    let x = Object.values(char.actions);
+    //find index of this function
+    let y = x.indexOf(doubleAttack);
+    //get list of actions' keys
+    let z = Object.keys(attacker.actions);
+    //z[y] is attack name!
+}
+
 function levelUp(char) {
     char.HP += roll(4);
     if(char.MP > 0) {
@@ -196,6 +207,7 @@ function levelUp(char) {
     char.wisdom += roll(4) + mod(char.wisdom);
     char.charisma += roll(4) + mod(char.charisma);
 }
+
 function beforeTurn(char) {
     //store barrier hp
     console.log (char.buff);
@@ -496,7 +508,7 @@ function manaRecover (attacker, defender) {
     //determine MP recovered
     let plusMP = roll(mod(attacker.intelligence)) + mod(attacker.intelligence);
     //if more than Max, set to maxMP
-    if(attacker.maxMP > attacker.MP + plusMP) {
+    if(attacker.maxMP < attacker.MP + plusMP) {
         attacker.MP = attacker.maxMP;
     //else add it
     } else {
