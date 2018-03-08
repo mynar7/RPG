@@ -185,10 +185,11 @@ function getActionName(char) {
     //get list of actions' function names
     let x = Object.values(char.actions);
     //find index of this function
-    let y = x.indexOf(doubleAttack);
+    let y = x.indexOf(arguments.callee.caller);
     //get list of actions' keys
-    let z = Object.keys(attacker.actions);
+    let z = Object.keys(char.actions);
     //z[y] is attack name!
+    return z[y];
 }
 
 function levelUp(char) {
@@ -373,14 +374,8 @@ function attackIt(attacker, defender, fx, num) {
 
 function doubleAttack(attacker, defender) {
 
-    //get list of actions' function names
-    let x = Object.values(attacker.actions);
-    //find index of this function
-    let y = x.indexOf(doubleAttack);
-    //get list of actions' keys
-    let z = Object.keys(attacker.actions);
-    //z[y] is attack name!
-    printC(attacker.name + ' uses ' + z[y] + '!');
+    let name = getActionName(attacker);
+    printC(attacker.name + ' uses ' + name + '!');
 
     multiAttack(attacker, defender, 2);
     attacker.SP--;
