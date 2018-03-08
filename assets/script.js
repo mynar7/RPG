@@ -108,9 +108,17 @@ var charList = {
         intelligence: 16, 
         wisdom: 13,
         charisma: 8,
+        channelCounter: 0,
         actions: {
-            Attack: attackIt,
             Fireball: fireball,
+            Channel: function (attacker) {
+                printC(attacker.name + ' focuses their energy!')
+                attacker.channelCounter+=2;
+            },
+            Arcane_Volley: magicMissles,
+            Gather_Mana: manaRecover,
+            Dispel_Toxin: curePoison,
+            Arcane_Protection: barrier,
 			/*
 			function () {
 				charges(player, counterName, charges);
@@ -188,8 +196,19 @@ function levelUp(char) {
     char.wisdom += roll(4) + mod(char.wisdom);
     char.charisma += roll(4) + mod(char.charisma);
 }
+function beforeTurn(char) {
+    //store barrier hp
+    console.log (char.buff);
+    switch (char.buff) {
+        case 'barrier':
+                //store char's current HP
+                char.memoryHP = char.HP;
+                console.log("memHP ", char.memoryHP);
+        break;
+    }
 
-function debuff(char) {
+}
+function afterTurn(char) {
     switch (char.debuff){
         case 'poison':
 		let psnDmg = roll(6) - mod(char.constitution);
@@ -206,6 +225,35 @@ function debuff(char) {
             	printC(char.name + " is no longer poisoned");
         	}
         break;//end poison case
+        }
+        console.log("debuff", " " +char.name + char.buff);
+    switch(char.buff) {
+        case 'barrier':
+            //if char was healed, do nothing
+            if(char.memoryHP > char.HP) {
+                //calculate how much HP was lost
+                let barDmg = char.memoryHP - char.HP;
+                //if barrier has more HP than HP lost to dmg
+                if(char.barrierHP > barDmg) {
+                    char.HP += barDmg;
+                    char.barrierHP -= barDmg;
+                    printC(char.name + "'s barrier absorbs " + barDmg + ' points of damage!');
+                    
+                //dmg > barHP
+                } else {
+                    char.HP += char.barrierHP;
+                    printC(char.name + "'s barrier absorbs " + char.barrierHP + ' points of damage!');
+                    char.barrierHP = 0;
+                }
+            }
+            printC(char.name + "'s barrier has " + char.barrierHP + ' HP left');
+            
+            if (char.barrierHP <= 0) {
+                delete char.barrierHP
+                char.buff = '';
+                printC(char.name + "'s barrier is dispelled");                
+            }
+        break;
     }
 }
 
@@ -213,7 +261,8 @@ function debuff(char) {
 function turn(char, opponent, act) {
     //what did player choose to do?
     //can player do that?
-
+    beforeTurn(char);
+    beforeTurn(opponent);
     //stunned
     if(char.stunCounter <= 0) {
         delete char.stunCounter;
@@ -221,7 +270,7 @@ function turn(char, opponent, act) {
     if(char.stunCounter > 0) {
         char.stunCounter--;
         printC(char.name + " is stunned and cannot move!");
-        return;
+        cpuTurn(opponent, char);
     }
     //technically, this is unnecessary, but I'm checking anyway
     let x = Object.keys(char.actions);
@@ -240,17 +289,18 @@ function turn(char, opponent, act) {
         }
         return;
     }
-    debuff(char);
-
+    
     cpuTurn(opponent, char);
-    printC(char.name + ' has ' + char.HP + 'HP left');
-    printC(opponent.name + ' has ' + opponent.HP + 'HP left');
+
+    afterTurn(char);
+    afterTurn(opponent);
     printC('{-------------------------------}');
     
     
 }
 
 function cpuTurn(cpu, target) {
+    
     //stunned
     if(cpu.stunCounter <= 0) {
         delete cpu.stunCounter;
@@ -278,7 +328,6 @@ function cpuTurn(cpu, target) {
         } 
         cpuTurn(cpu, target);
     }
-    debuff(cpu);
 
 }
 
@@ -372,6 +421,22 @@ function multiAttack(attacker, defender, rounds) {
     }
     defender.HP-=dmg;
 }
+function curePoison(char) {
+    delete char.poisonCounter;
+    delete char.debuff;
+    
+    char.MP-=2;
+    if(char.MP <= 0) {
+        //get list of actions' function names
+        let x = Object.values(char.actions);
+        //find index of this function
+        let y = x.indexOf(curePoison);
+        //get list of actions' keys
+        let z = Object.keys(char.actions);
+        //delete this obj's action['thisFxName']
+        delete char.actions[z[y]];        
+    }   
+}
 
 function fireball(attacker, defender) {
     let diceRoll = roll(20);
@@ -382,7 +447,7 @@ function fireball(attacker, defender) {
     let z = Object.keys(attacker.actions);
 
     if(diceRoll + mod(attacker.intelligence) >= defender.AC) {
-        let dmg = roll(10) + mod(attacker.intelligence) + attacker.dmgBns;
+        let dmg = roll(attacker.damage) + mod(attacker.intelligence) + attacker.dmgBns;
         defender.HP-=dmg;
         printC(attacker.name + " casts " + z[y] + " at " + defender.name +"!");
         printC(defender.name + " takes " + dmg + " points of damage!");
@@ -398,6 +463,70 @@ function fireball(attacker, defender) {
         //get list of actions' keys
         let z = Object.keys(attacker.actions);
         //delete this obj's action['thisFxName']
+        delete attacker.actions[z[y]];        
+    }   
+}
+
+function barrier(attacker) {
+    //get list of actions' function names
+    let x = Object.values(attacker.actions);
+    //find index of this function
+    let y = x.indexOf(barrier);
+    //get list of actions' keys
+    let z = Object.keys(attacker.actions);
+    
+    printC(attacker.name + ' casts ' + z[y]);
+    if(roll(20) + mod(attacker.intelligence) > 10) {
+        attacker.barrierHP = roll(mod(attacker.maxHP)) + roll(attacker.damage) + mod(attacker.intelligence) + mod(attacker.constitution);
+        printC(attacker.name + ' is surrounded by a magical barrier with' + attacker.barrierHP + 'HP!');
+        attacker.buff = 'barrier';
+        attacker.memoryHP = attacker.HP;
+    } else {
+        printC('But the spell fizzles!');
+    }
+    attacker.MP-=3;
+    if(attacker.MP <= 0) {
+        //delete this obj's action['thisFxName']        
+        delete attacker.actions[z[y]];        
+    }   
+}
+
+function manaRecover (attacker, defender) {
+    printC(attacker.name + ' draws in arcane energy from their surroundings!');
+    //determine MP recovered
+    let plusMP = roll(mod(attacker.intelligence)) + mod(attacker.intelligence);
+    //if more than Max, set to maxMP
+    if(attacker.maxMP > attacker.MP + plusMP) {
+        attacker.MP = attacker.maxMP;
+    //else add it
+    } else {
+        attacker.MP += plusMP;
+    }
+}
+
+function magicMissles(attacker, defender) {
+    //get list of actions' function names
+    let x = Object.values(attacker.actions);
+    //find index of this function
+    let y = x.indexOf(magicMissles);
+    //get list of actions' keys
+    let z = Object.keys(attacker.actions);
+    printC(attacker.name + ' fires an ' + z[y] + '!');
+    let dmg = 0;
+    for(i = 0; i < attacker.channelCounter; i++) {
+        if (roll(20) + mod(attacker.intelligence) > defender.AC) {
+            dmg += roll(attacker.damage) + mod(attacker.intelligence) + attacker.dmgBns;
+        }
+    }
+    if(dmg > 0) {
+        defender.HP -= dmg;
+        printC(defender.name + ' takes ' + dmg + ' points of damage!');
+    } else {
+        printC(defender.name + ' narrowly avoids the arcane bolts!');
+    }
+    attacker.channelCounter = 0;
+    attacker.MP-=2;
+    if(attacker.MP <= 0) {
         delete attacker.actions[z[y]];        
     }   
 }
