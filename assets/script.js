@@ -305,6 +305,7 @@ function afterTurn(char) {
 function turn(char, opponent, act) {
     //what did player choose to do?
     //can player do that?
+    beforeTurn(opponent);
     beforeTurn(char);
     
     //stunned
@@ -326,12 +327,14 @@ function turn(char, opponent, act) {
     }
 
     afterTurn(char);
-    printC('{-------------------------------}');
+    afterTurn(opponent);
+    printC('{---------------------------------------------------}');
     
     
 }
 
 function cpuTurn(cpu, target) {
+    beforeTurn(target);
     beforeTurn(cpu);
     //stunned
     if(cpu.stunCounter <= 0) {
@@ -351,6 +354,9 @@ function cpuTurn(cpu, target) {
     let a = cpu.actions[z];
     a(cpu, target);
     afterTurn(cpu);
+    afterTurn(target);
+    printC('{---------------------------------------------------}');
+    
 }
 
 //basic attack fx
