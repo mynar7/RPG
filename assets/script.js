@@ -74,11 +74,11 @@ function mod(score) {
 var charList = {
     char1: {
         name: 'Knight',
-        HP: 32,
+        HP: 102,
         AC: 11,
         MP: 0,
         SP: 4,
-        damage: 6,
+        damage: 7,
         dmgBns: 4,
         strength: 16,
         dexterity: 9,
@@ -100,7 +100,7 @@ var charList = {
                 }
             },
             Sword_Stance: function(attacker) {
-                if(attacker.stance != 'offensive') {
+                if(attacker.stance !== 'offensive') {
                     attacker.stance = 'offensive';
                     printC(attacker.name + ' assumes an offensive stance!');                   
                     attacker.AC-=6;
@@ -108,7 +108,7 @@ var charList = {
                     attacker.dmgBns+=mod(attacker.strength);
                     attacker.dexterity+=mod(attacker.strength);
                 }
-                if(attacker.stance == 'defensive') {
+                if(attacker.stance === 'defensive') {
                     attacker.stance = 'offensive';
                     printC(attacker.name + ' assumes an offensive stance!');                    
                     attacker.AC-=12;
@@ -117,14 +117,14 @@ var charList = {
                 }
             },
             Guard_Stance: function(attacker) {
-                if(attacker.stance != 'defensive') {
+                if(attacker.stance !== 'defensive') {
                     attacker.stance = 'defensive';
                     printC(attacker.name + ' assumes a defensive stance!');
                     attacker.AC+=6;
                     attacker.damage-=mod(attacker.strength);
                     attacker.dmgBns-=mod(attacker.strength);
                 }
-                if(attacker.stance == 'offensive') {
+                if(attacker.stance === 'offensive') {
                     attacker.stance = 'defensive';
                     printC(attacker.name + ' assumes a defensive stance!');
                     attacker.AC+=12;
@@ -140,12 +140,12 @@ var charList = {
 
     char2: {
         name: 'Sorcerer',
-        HP: 27,
+        HP: 78,
         AC: 9,
         MP: 10,
         SP: 1,
-        damage: 3, //+3. but 1d10 flat with fireball
-        dmgBns: 2,
+        damage: 6, //+3. but 1d10 flat with fireball
+        dmgBns: 4,
         strength: 10,
         dexterity: 16,
         constitution: 12,
@@ -157,7 +157,7 @@ var charList = {
         actions: {
             Gather_Mana: manaRecover,
             Arcane_Bolt: function(attacker, defender) {
-                printA(attacker, "Fireball", 'MP');
+                printA(attacker, "Arcane Bolt", 'MP');
                 fireball(attacker, defender);
             },
             Channel: channel,
@@ -176,11 +176,11 @@ var charList = {
     },
     char3: {
         name: 'Rogue',
-        HP: 25,
+        HP: 70,
         AC: 14,
         MP: 0,
         SP: 5,
-        damage: 4, //+3? 
+        damage: 8, //+3? 
         dmgBns: 4,
         strength: 8,
         dexterity: 16,
@@ -188,7 +188,7 @@ var charList = {
         intelligence: 13, 
         wisdom: 12,
         charisma: 16,
-        speed: 35,
+        speed: 28,
         actions: {
             Stab: attackIt,
             Poison_Strike: poisonAttack,
@@ -203,19 +203,19 @@ var charList = {
 
     char4: {
         name: 'Monk',
-        HP: 40,
+        HP: 85,
         AC: 12,
         MP: 0,
         SP: 0,
         damage: 4,
-        dmgBns: 1,
+        dmgBns: 2,
         strength: 8,
         dexterity: 17,
         constitution: 14,
         intelligence: 10, 
         wisdom: 14,
         charisma: 12,
-        speed: 35,
+        speed: 20,
         channelCounter: 0,
         actions: {
             Focus: channel,
@@ -262,7 +262,7 @@ function printA (attacker, actName, points) {
 }
 
 function levelUp(char) {
-    char.HP += roll(4);
+    char.HP += roll(20);
     if(char.MP > 0) {
         char.MP++;
     }
@@ -325,7 +325,6 @@ function afterTurn(char) {
                     char.barrierHP = 0;
                 }
             }
-            printC(char.name + "'s barrier has " + char.barrierHP + ' HP left');
             
             if (char.barrierHP <= 0) {
                 delete char.barrierHP
@@ -490,9 +489,9 @@ function fireball(attacker, defender) {
 
 function barrier(attacker) {
     if(attacker.MP >= 3) {
-        if(roll(20) + mod(attacker.intelligence) > 10) {
-            attacker.barrierHP = roll(mod(attacker.maxHP)) + roll(attacker.damage) + mod(attacker.intelligence) + mod(attacker.constitution);
-            printC(attacker.name + ' is surrounded by a magical barrier with' + attacker.barrierHP + 'HP!');
+        if(roll(20) + mod(attacker.intelligence) > 11) {
+            attacker.barrierHP = roll(attacker.maxHP / 2) + roll(attacker.damage) + mod(attacker.intelligence) + mod(attacker.constitution);
+            printC(attacker.name + ' is surrounded by a magical barrier with ' + attacker.barrierHP + ' HP!');
             attacker.buff = 'barrier';
             attacker.memoryHP = attacker.HP;
         } else {
