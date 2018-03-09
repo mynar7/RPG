@@ -132,7 +132,10 @@ var charList = {
                     attacker.dmgBns-=mod(attacker.strength) * 2;
                     attacker.dexterity-=mod(attacker.strength);
                 }
-            },
+            }, //END ACTIONS
+		story: {
+			backStory: "As you come to, you remember that you are Mance Krauss, a knight of Erdwynn, and sworn to protect the kingdom of ",
+			},//END STORY
         },
         imgSrcLeft:'./assets/images/char6left.png',
         imgSrcRight:'./assets/images/char6right.png',
