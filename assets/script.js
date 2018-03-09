@@ -91,11 +91,46 @@ var charList = {
             Attack: function(attacker, defender) {
                 attackIt(attacker, defender);
             },
+            Rest: skillRecover,
             Double_Slash: function(attacker, defender) {
                 printA(attacker, 'Double Slash', 'SP');
                 if(attacker.SP >= 1) {
                     multiAttack(attacker, defender, 2);
                     attacker.SP--;
+                }
+            },
+            Sword_Stance: function(attacker) {
+                if(attacker.stance != 'offensive') {
+                    attacker.stance = 'offensive';
+                    printC(attacker.name + ' assumes an offensive stance!');                   
+                    attacker.AC-=6;
+                    attacker.damage+=mod(attacker.strength);
+                    attacker.dmgBns+=mod(attacker.strength);
+                    attacker.dexterity+=mod(attacker.strength);
+                }
+                if(attacker.stance == 'defensive') {
+                    attacker.stance = 'offensive';
+                    printC(attacker.name + ' assumes an offensive stance!');                    
+                    attacker.AC-=12;
+                    attacker.damage+=mod(attacker.strength) * 2;
+                    attacker.dmgBns+=mod(attacker.strength) * 2;
+                }
+            },
+            Guard_Stance: function(attacker) {
+                if(attacker.stance != 'defensive') {
+                    attacker.stance = 'defensive';
+                    printC(attacker.name + ' assumes a defensive stance!');
+                    attacker.AC+=6;
+                    attacker.damage-=mod(attacker.strength);
+                    attacker.dmgBns-=mod(attacker.strength);
+                }
+                if(attacker.stance == 'offensive') {
+                    attacker.stance = 'defensive';
+                    printC(attacker.name + ' assumes a defensive stance!');
+                    attacker.AC+=12;
+                    attacker.damage-=mod(attacker.strength) * 2;
+                    attacker.dmgBns-=mod(attacker.strength) * 2;
+                    attacker.dexterity-=mod(attacker.strength);
                 }
             },
         },
@@ -173,7 +208,7 @@ var charList = {
         MP: 0,
         SP: 0,
         damage: 4,
-        dmgBns: 3,
+        dmgBns: 1,
         strength: 8,
         dexterity: 17,
         constitution: 14,
@@ -414,6 +449,21 @@ function multiAttack(attacker, defender, rounds) {
         printC(defender.name + ' takes ' + dmg + ' points of damage!');
     }
     defender.HP-=dmg;
+}
+
+function skillRecover (attacker) {
+    if(attacker.SP < attacker.maxSP) {
+        printC(attacker.name + ' takes a brief rest to determine their next move!');
+        //determine SP recovered
+        let plusSP = roll(mod(attacker.dexterity) + mod(attacker.strength) + mod(attacker.constitution));
+        //if more than Max, set to maxSP
+        if(attacker.maxSP < attacker.SP + plusSP) {
+            attacker.SP = attacker.maxSP;
+            //else add it
+        } else {
+            attacker.SP += plusSP;
+        }
+    }
 }
 
 function curePoison(char) {
@@ -684,8 +734,7 @@ $(document).ready(function () {
                         game.gameLogic();                        
                         //do combat with selected action!
                         turn(game.player, game.currentOpponent, $(this).text());
-                        //check if you're dead, then do it again!
-                        game.gameLogic();
+                        
                         game.waiting = true;
                         $('#playerTime').css({width: "0"});
                         game.pTimeVar = setInterval(function (){
@@ -698,8 +747,10 @@ $(document).ready(function () {
                         //start cpu here
                         if(!game.battleStarted) {
                             game.opponentTurn();
+                            game.battleStarted = true;
                         } 
-                        game.battleStarted = true;
+                        //check if you're dead, then do it again!
+                        game.gameLogic();
                     }
                     });
                 $('#actionBtns').append(btn);
@@ -845,6 +896,7 @@ $(document).ready(function () {
         },
 
         //this allows battle to end, and shows text in combatText saying who won
+        //also removes action buttons and attaches continue button linking to story page
         battleWon: function(fx, str, pic) {
             $('#actionBtns').empty();
             let a;
