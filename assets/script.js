@@ -86,9 +86,18 @@ var charList = {
         intelligence: 13, 
         wisdom: 11,
         charisma: 14,
+        speed: 40,
         actions: {
-            Attack: attackIt,
-            Double_Slash: doubleAttack,
+            Attack: function(attacker, defender) {
+                attackIt(attacker, defender);
+            },
+            Double_Slash: function(attacker, defender) {
+                printA(attacker, 'Double Slash', 'SP');
+                if(attacker.SP >= 1) {
+                    multiAttack(attacker, defender, 2);
+                    attacker.SP--;
+                }
+            },
         },
         imgSrcLeft:'./assets/images/char6left.png',
         imgSrcRight:'./assets/images/char6right.png',
@@ -98,7 +107,7 @@ var charList = {
         name: 'Sorcerer',
         HP: 27,
         AC: 13,
-        MP: 4,
+        MP: 10,
         SP: 1,
         damage: 3, //+3. but 1d10 flat with fireball
         dmgBns: 2,
@@ -108,23 +117,24 @@ var charList = {
         intelligence: 16, 
         wisdom: 13,
         charisma: 8,
+        speed: 30,
         channelCounter: 0,
         actions: {
-            Fireball: fireball,
-            Channel: function (attacker) {
-                printC(attacker.name + ' focuses their energy!')
-                attacker.channelCounter+=2;
-            },
-            Arcane_Volley: magicMissles,
             Gather_Mana: manaRecover,
+            Arcane_Bolt: function(attacker, defender) {
+                printA(attacker, "Fireball", 'MP');
+                fireball(attacker, defender);
+            },
+            Channel: channel,
+            Arcane_Volley: function (attacker, defender) {
+                printA(attacker, "Arcane Volley", 'MP');
+                magicMissles(attacker, defender);
+            },
             Dispel_Toxin: curePoison,
-            Arcane_Protection: barrier,
-			/*
-			function () {
-				charges(player, counterName, charges);
-			}
-			for instance, for channel, then amount of magic missiles to shoot
-			*/
+            Arcane_Protection: function(attacker, defender) {
+                printA(attacker, "Arcane Protection", 'MP');
+                barrier(attacker, defender);
+            },
         },
         imgSrcLeft:'./assets/images/char2left.png',
         imgSrcRight:'./assets/images/char2right.png',
@@ -143,10 +153,14 @@ var charList = {
         intelligence: 13, 
         wisdom: 12,
         charisma: 16,
+        speed: 35,
         actions: {
             Stab: attackIt,
             Poison_Strike: poisonAttack,
-            Groin_Kick: kick,
+            Groin_Kick: function(attacker, defender) {
+                printA(attacker, "Groin Kick", 'SP');
+                kick(attacker, defender);
+            },
         },
         imgSrcLeft:'./assets/images/char3left.png',
         imgSrcRight:'./assets/images/char3right.png',
@@ -157,7 +171,7 @@ var charList = {
         HP: 40,
         AC: 10,
         MP: 0,
-        SP: 5,
+        SP: 0,
         damage: 4,
         dmgBns: 3,
         strength: 8,
@@ -166,30 +180,50 @@ var charList = {
         intelligence: 10, 
         wisdom: 14,
         charisma: 12,
+        speed: 35,
+        channelCounter: 0,
         actions: {
-            Punch: attackIt,
-            Quick_Fist: doubleAttack,
-            Inner_Chi: haste,
+            Focus: channel,
+            Double_Strike: function(attacker, defender) {
+                multiAttack(attacker, defender, 2);
+            },
+            Punishing_Fists: function (attacker, defender) {
+                printA(attacker, 'Punishing Fists!');
+                multiAttack(attacker, defender, attacker.channelCounter + 2);
+                attacker.channelCounter = 0;
+            }, 
         },
         imgSrcLeft:'./assets/images/char4left.png',
         imgSrcRight:'./assets/images/char4right.png',
     }
 }
+
 //super important for deep copy! Thanks stack overflow!
 function copy(oldObject) {
     var newObject = jQuery.extend(true, {}, oldObject);
     return newObject;
 }
 
-function getActionName(char) {
-    //get list of actions' function names
-    let x = Object.values(char.actions);
-    //find index of this function
-    let y = x.indexOf(arguments.callee.caller);
-    //get list of actions' keys
-    let z = Object.keys(char.actions);
-    //z[y] is attack name!
-    return z[y];
+function printA (attacker, actName, points) {
+    switch (points) {
+        case 'SP':
+        if (attacker.SP > 0) {
+            printC(attacker.name + ' uses ' + actName + '!');
+        } else {
+            printC(attacker.name + ' is out of ' + points + '!');
+        }
+        break;
+        case 'MP':
+        if (attacker.MP > 0) {
+            printC(attacker.name + ' uses ' + actName + '!');
+        } else {
+            printC(attacker.name + ' is out of ' + points + '!');
+        }
+        break;
+        default: 
+            printC(attacker.name + ' uses ' + actName + '!');
+        break;
+    }
 }
 
 function levelUp(char) {
@@ -211,12 +245,10 @@ function levelUp(char) {
 
 function beforeTurn(char) {
     //store barrier hp
-    console.log (char.buff);
     switch (char.buff) {
         case 'barrier':
                 //store char's current HP
                 char.memoryHP = char.HP;
-                console.log("memHP ", char.memoryHP);
         break;
     }
 
@@ -239,7 +271,6 @@ function afterTurn(char) {
         	}
         break;//end poison case
         }
-        console.log("debuff", " " +char.name + char.buff);
     switch(char.buff) {
         case 'barrier':
             //if char was healed, do nothing
@@ -275,7 +306,7 @@ function turn(char, opponent, act) {
     //what did player choose to do?
     //can player do that?
     beforeTurn(char);
-    beforeTurn(opponent);
+    
     //stunned
     if(char.stunCounter <= 0) {
         delete char.stunCounter;
@@ -294,26 +325,14 @@ function turn(char, opponent, act) {
         printC('no such action!');
     }
 
-    if(char.buff == 'haste') {
-        char.hasteCounter--;
-        if(char.hasteCounter < 0) {
-            delete char.buff;
-            delete char.hasteCounter;
-        }
-        return;
-    }
-    
-    cpuTurn(opponent, char);
-
     afterTurn(char);
-    afterTurn(opponent);
     printC('{-------------------------------}');
     
     
 }
 
 function cpuTurn(cpu, target) {
-    
+    beforeTurn(cpu);
     //stunned
     if(cpu.stunCounter <= 0) {
         delete cpu.stunCounter;
@@ -324,32 +343,14 @@ function cpuTurn(cpu, target) {
         printC(cpu.name + " is stunned and cannot move!");
         return;
     }
-
+    
+    //do a random action
     let x = Object.keys(cpu.actions);
     let y = Math.floor(Math.random() * x.length);
     let z = x[y];
     let a = cpu.actions[z];
     a(cpu, target);
-
-    //haste conditional
-    if(cpu.buff == 'haste') {
-        cpu.hasteCounter--;
-        if(cpu.hasteCounter < 0) {
-            delete cpu.buff;
-            delete cpu.hasteCounter;
-            return;
-        } 
-        cpuTurn(cpu, target);
-    }
-
-}
-
-//debugging fx
-function autoTurn(player, cpu) {
-    cpuTurn(player, cpu);
-    cpuTurn(cpu, player);
-    printC(player.name + ' has ' + player.HP + 'HP left');
-    printC(cpu.name + ' has ' + cpu.HP + 'HP left');
+    afterTurn(cpu);
 }
 
 //basic attack fx
@@ -372,26 +373,6 @@ function attackIt(attacker, defender, fx, num) {
     }
 }
 
-function doubleAttack(attacker, defender) {
-
-    let name = getActionName(attacker);
-    printC(attacker.name + ' uses ' + name + '!');
-
-    multiAttack(attacker, defender, 2);
-    attacker.SP--;
-    if(attacker.SP <= 0) {
-        //get list of actions' function names
-        let x = Object.values(attacker.actions);
-        //find index of this function
-        let y = x.indexOf(doubleAttack);
-        //get list of actions' keys
-        let z = Object.keys(attacker.actions);
-        //delete this obj's action['thisFxName']
-        delete attacker.actions[z[y]];        
-    }   
-}
-
-//lazy implementation, change later
 function multiAttack(attacker, defender, rounds) {
     let hits = 0;
     let dmg = 0;
@@ -428,135 +409,84 @@ function multiAttack(attacker, defender, rounds) {
     }
     defender.HP-=dmg;
 }
+
 function curePoison(char) {
-    delete char.poisonCounter;
-    delete char.debuff;
-    
-    char.MP-=2;
-    if(char.MP <= 0) {
-        //get list of actions' function names
-        let x = Object.values(char.actions);
-        //find index of this function
-        let y = x.indexOf(curePoison);
-        //get list of actions' keys
-        let z = Object.keys(char.actions);
-        //delete this obj's action['thisFxName']
-        delete char.actions[z[y]];        
-    }   
+    if (char.MP >= 2) {
+        delete char.poisonCounter;
+        delete char.debuff;
+        char.MP-=2;
+    }
 }
 
 function fireball(attacker, defender) {
-    let diceRoll = roll(20);
-    printC(attacker.name + " rolled: " + diceRoll);    
-    //all this junk gets the name of the key this function is stored to in char's object
-    let x = Object.values(attacker.actions);
-    let y = x.indexOf(fireball);
-    let z = Object.keys(attacker.actions);
+    if(attacker.MP > 0) {
 
-    if(diceRoll + mod(attacker.intelligence) >= defender.AC) {
-        let dmg = roll(attacker.damage) + mod(attacker.intelligence) + attacker.dmgBns;
-        defender.HP-=dmg;
-        printC(attacker.name + " casts " + z[y] + " at " + defender.name +"!");
-        printC(defender.name + " takes " + dmg + " points of damage!");
-    } else {
-        printC(attacker.name + " casts " + z[y] + " at "  + defender.name + ", but " + defender.name + " dodges the blast!");
+        if(roll(20) + mod(attacker.intelligence) >= defender.AC) {
+            let dmg = roll(attacker.damage) + mod(attacker.intelligence) + attacker.dmgBns;
+            defender.HP-=dmg;
+            printC(defender.name + " takes " + dmg + " points of damage!");
+        } else {
+            printC(defender.name + " dodges the blast!");
+        }
+        attacker.MP--;
     }
-    attacker.MP--;
-    if(attacker.MP <= 0) {
-        //get list of actions' function names
-        let x = Object.values(attacker.actions);
-        //find index of this function
-        let y = x.indexOf(fireball);
-        //get list of actions' keys
-        let z = Object.keys(attacker.actions);
-        //delete this obj's action['thisFxName']
-        delete attacker.actions[z[y]];        
-    }   
 }
 
 function barrier(attacker) {
-    //get list of actions' function names
-    let x = Object.values(attacker.actions);
-    //find index of this function
-    let y = x.indexOf(barrier);
-    //get list of actions' keys
-    let z = Object.keys(attacker.actions);
-    
-    printC(attacker.name + ' casts ' + z[y]);
-    if(roll(20) + mod(attacker.intelligence) > 10) {
-        attacker.barrierHP = roll(mod(attacker.maxHP)) + roll(attacker.damage) + mod(attacker.intelligence) + mod(attacker.constitution);
-        printC(attacker.name + ' is surrounded by a magical barrier with' + attacker.barrierHP + 'HP!');
-        attacker.buff = 'barrier';
-        attacker.memoryHP = attacker.HP;
-    } else {
-        printC('But the spell fizzles!');
+    if(attacker.MP >= 3) {
+        if(roll(20) + mod(attacker.intelligence) > 10) {
+            attacker.barrierHP = roll(mod(attacker.maxHP)) + roll(attacker.damage) + mod(attacker.intelligence) + mod(attacker.constitution);
+            printC(attacker.name + ' is surrounded by a magical barrier with' + attacker.barrierHP + 'HP!');
+            attacker.buff = 'barrier';
+            attacker.memoryHP = attacker.HP;
+        } else {
+            printC('But the spell fizzles!');
+        }
+        attacker.MP-=3;           
     }
-    attacker.MP-=3;
-    if(attacker.MP <= 0) {
-        //delete this obj's action['thisFxName']        
-        delete attacker.actions[z[y]];        
-    }   
 }
 
 function manaRecover (attacker, defender) {
-    printC(attacker.name + ' draws in arcane energy from their surroundings!');
-    //determine MP recovered
-    let plusMP = roll(mod(attacker.intelligence)) + mod(attacker.intelligence);
-    //if more than Max, set to maxMP
-    if(attacker.maxMP < attacker.MP + plusMP) {
-        attacker.MP = attacker.maxMP;
-    //else add it
-    } else {
-        attacker.MP += plusMP;
+    if(attacker.MP < attacker.maxMP) {
+        printC(attacker.name + ' draws in arcane energy from their surroundings!');
+        //determine MP recovered
+        let plusMP = roll(mod(attacker.intelligence)) + mod(attacker.intelligence);
+        //if more than Max, set to maxMP
+        if(attacker.maxMP < attacker.MP + plusMP) {
+            attacker.MP = attacker.maxMP;
+            //else add it
+        } else {
+            attacker.MP += plusMP;
+        }
     }
+}
+
+function channel(attacker) {
+    printC(attacker.name + ' focuses their energy!');
+    attacker.channelCounter+=2;
+    printC(attacker.name + ' has ' + attacker.channelCounter + ' charges');
 }
 
 function magicMissles(attacker, defender) {
-    //get list of actions' function names
-    let x = Object.values(attacker.actions);
-    //find index of this function
-    let y = x.indexOf(magicMissles);
-    //get list of actions' keys
-    let z = Object.keys(attacker.actions);
-    printC(attacker.name + ' fires an ' + z[y] + '!');
-    let dmg = 0;
-    for(i = 0; i < attacker.channelCounter; i++) {
-        if (roll(20) + mod(attacker.intelligence) > defender.AC) {
-            dmg += roll(attacker.damage) + mod(attacker.intelligence) + attacker.dmgBns;
+    if(attacker.MP >= 2) {
+        let dmg = 0;
+        let bolts = 0;
+        for(i = 0; i < attacker.channelCounter; i++) {
+            if (roll(20) + mod(attacker.intelligence) > defender.AC) {
+                dmg += roll(attacker.damage) + mod(attacker.intelligence) + attacker.dmgBns;
+                bolts++;
+            }
         }
+        if(dmg > 0) {
+            defender.HP -= dmg;
+            printC(defender.name + ' is hit by ' + bolts + ' out of '+ attacker.channelCounter +  ' bolts!');
+            printC(defender.name + ' takes ' + dmg + ' points of damage!');
+        } else {
+            printC(defender.name + ' narrowly avoids all of arcane bolts!');
+        }
+        attacker.channelCounter = 0;
+        attacker.MP-=2;
     }
-    if(dmg > 0) {
-        defender.HP -= dmg;
-        printC(defender.name + ' takes ' + dmg + ' points of damage!');
-    } else {
-        printC(defender.name + ' narrowly avoids the arcane bolts!');
-    }
-    attacker.channelCounter = 0;
-    attacker.MP-=2;
-    if(attacker.MP <= 0) {
-        delete attacker.actions[z[y]];        
-    }   
-}
-
-function haste(char) {
-    char.buff = 'haste';
-    char.hasteCounter = mod(char.dexterity);
-    //all this junk gets the name of the key this function is stored to in char's object
-    let x = Object.values(char.actions);
-    let y = x.indexOf(haste);
-    let z = Object.keys(char.actions);
-    printC(char.name + " casts " + z[y] + "!");
-    char.MP-=2;
-    if(char.MP <= 0) {
-        //get list of actions' function names
-        let x = Object.values(char.actions);
-        //find index of this function
-        let y = x.indexOf(haste);
-        //get list of actions' keys
-        let z = Object.keys(char.actions);
-        //delete this obj's action['thisFxName']
-        delete char.actions[z[y]];        
-    }   
 }
 
 function poisonAttack(attacker, defender) {
@@ -577,31 +507,19 @@ function poison(attacker, defender) {
 }//end function
 
 function kick(attacker, defender) {
-    //get list of actions' function names
-    let x = Object.values(attacker.actions);
-    //find index of this function
-    let y = x.indexOf(kick);
-    //get list of actions' keys
-    let z = Object.keys(attacker.actions);
-    //z[y] is attack name!
-    printC(attacker.name + ' uses ' + z[y] + '!');
-
-    attackIt(attacker, defender, stun);
-
     //cost of this skill
-    attacker.SP-=1;
-    if(attacker.SP <= 0) {
-        delete attacker.actions[z[y]];        
-    }   
+    if(attacker.SP > 0) {
+        attackIt(attacker, defender, stun);
+        attacker.SP-=1;
+    }
 }
 
 function stun(attacker, defender) {
-    defender.stunCounter = roll(4) - mod(defender.constitution) + mod(attacker.strength);
-	if(defender.stunCounter > 0) {
-    		printC(defender.name + " is stunned!");
+	if(roll(20) + mod(defender.constitution) > 12 + mod(attacker.strength)) {
+    defender.stunCounter = roll(4);
+    printC(defender.name + " is stunned!");
 	} else {
 		printC(defender.name + " resists stun!");
-		delete defender.stunCounter;
 	}
 }
 
@@ -684,6 +602,8 @@ $(document).ready(function () {
                 $('<h2>').attr("id", "playerSP").attr("class", "playerSP").appendTo('#playerDiv');
 				$('<h3>').attr("id", "playerSPnum").attr("class", "playerSPnum").text('SP: ' + game.player.SP + '/' + game.player.maxSP).appendTo('#playerDiv');
             }
+            $('<h4>').attr("id", "playerTime").attr("class", "playerTime").appendTo('#playerDiv');
+            $('<h3>').attr("id", "playerTimeNum").attr("class", "playerTimeNum").text('Time').appendTo('#playerDiv');                      
             $('body').append($('<h1>')
                         .attr("class", "instr")
                         .attr("id", "instr")
@@ -732,6 +652,8 @@ $(document).ready(function () {
                 $('<h2>').attr("id", "enemySP").attr("class", "enemySP").appendTo('#enemyDiv');
 				$('<h3>').attr("id", "enemySPnum").attr("class", "enemySPnum").text('SP: ' + game.currentOpponent.SP +  '/' +game.currentOpponent.maxSP).appendTo('#enemyDiv');
             }
+            $('<h4>').attr("id", "enemyTime").attr("class", "enemyTime").appendTo('#enemyDiv');
+            $('<h3>').attr("id", "enemyTimeNum").attr("class", "enemyTimeNum").text('Time').appendTo('#enemyDiv');
             //remove enemy pics
             $('#enemies').remove();
             $('#instr').remove();
@@ -741,7 +663,8 @@ $(document).ready(function () {
             //add div for btns
             let actionBtns = $('<div>').attr("id", "actionBtns").attr("class", "actionBtns");
             $('body').append(actionBtns);
-            game.gameLogic();
+            game.drawButtons();
+            game.opponentTurn();
         },//end enterBattle
 
         drawButtons: function() {
@@ -751,22 +674,39 @@ $(document).ready(function () {
             for(i = 0; i < act.length; i++){
                 let btn = $('<button>').attr("class", "actionBtn").text(act[i]);
                 $(btn).on("click", function(){
-                    //do combat with selected action!
-                    turn(game.player, game.currentOpponent, $(this).text());
-                    game.updateStatBars();
-                    //check if you're dead, then do it again!
-                    game.gameLogic();
+                    if(!game.waiting) {
+                        game.gameLogic();                        
+                        //do combat with selected action!
+                        turn(game.player, game.currentOpponent, $(this).text());
+                        //check if you're dead, then do it again!
+                        game.gameLogic();
+                        game.waiting = true;
+                        $('#playerTime').css({width: "0"});
+                        game.pTimeVar = setInterval(function (){
+                            game.pTime();
+                        }, game.player.speed);
+                        setTimeout(function(){
+                            game.waiting = false;
+                            clearInterval(game.pTimeVar);
+                        }, 1000 * game.player.speed / 10);
+                        //start interval here
+                    }
                     });
                 $('#actionBtns').append(btn);
             }//end for lp
             
         },//end drawButtons
+        //update player time Bar
+        
+        pTime: function() {
+            //bars are #enemyTime and #playerTime
+            $('#playerTime').css({width: "+=1%"});
 
+        },
         //make awesome stat bars!
         updateStatBars: function() {
             //update player bars
             //if HP is negative, don't make a neg bar!
-        
             if(game.player.HP <= 0){
 				$('#playerHPnum').text('HP: 0/' + game.player.maxHP);
                 $('#playerHP').animate({"width": 0});
@@ -829,16 +769,41 @@ $(document).ready(function () {
             }//end drawing SP
         }, //end update bars!
 
+        opponentTurn: function() {
+            clearInterval(game.cpu);
+
+            //repeating starts here
+            game.cpu = setInterval(function(){
+                //clear enemy time var, stopping time bar
+                clearInterval(game.eTimeVar);
+                //check win/loss
+                game.gameLogic();
+                //actual turn
+                cpuTurn(game.currentOpponent, game.player);
+                //enemy is doing action, so set bar to 0%
+                $('#enemyTime').css({width: '0'});
+                //start time bar
+                game.eTimeVar = setInterval(function (){
+                    $('#enemyTime').css({width: '+=1%'});
+                }, game.currentOpponent.speed);
+                
+                //check win/loss after turn, and stop everything
+                game.gameLogic();
+            }, 1000 * game.currentOpponent.speed / 10);
+
+        },
         //handle win/loss
         gameLogic: function() {
-            if(game.player.HP > 0) {
-                game.drawButtons();
-            }
+            game.updateStatBars();
             //if you die, this
             if(game.player.HP <= 0){
+                clearInterval(game.cpu);
+                clearInterval(game.eTimeVar);                                
                 game.battleWon(game.characterSelect, "You lost", 'player');
             //if you win a battle, this
             } else if(game.currentOpponent.HP <= 0) {
+                clearInterval(game.cpu);
+                clearInterval(game.eTimeVar);                
                 //delete this char from opponents
                 let defeated = $('.enemyBattlePic').attr("id");
                 delete game.chars[defeated];
