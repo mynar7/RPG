@@ -106,7 +106,7 @@ var charList = {
     char2: {
         name: 'Sorcerer',
         HP: 27,
-        AC: 13,
+        AC: 9,
         MP: 10,
         SP: 1,
         damage: 3, //+3. but 1d10 flat with fireball
@@ -142,7 +142,7 @@ var charList = {
     char3: {
         name: 'Rogue',
         HP: 25,
-        AC: 15,
+        AC: 14,
         MP: 0,
         SP: 5,
         damage: 4, //+3? 
@@ -169,7 +169,7 @@ var charList = {
     char4: {
         name: 'Monk',
         HP: 40,
-        AC: 10,
+        AC: 12,
         MP: 0,
         SP: 0,
         damage: 4,
@@ -670,7 +670,7 @@ $(document).ready(function () {
             let actionBtns = $('<div>').attr("id", "actionBtns").attr("class", "actionBtns");
             $('body').append(actionBtns);
             game.drawButtons();
-            game.opponentTurn();
+            game.battleStarted = false;
         },//end enterBattle
 
         drawButtons: function() {
@@ -695,7 +695,11 @@ $(document).ready(function () {
                             game.waiting = false;
                             clearInterval(game.pTimeVar);
                         }, 1000 * game.player.speed / 10);
-                        //start interval here
+                        //start cpu here
+                        if(!game.battleStarted) {
+                            game.opponentTurn();
+                        } 
+                        game.battleStarted = true;
                     }
                     });
                 $('#actionBtns').append(btn);
@@ -803,11 +807,13 @@ $(document).ready(function () {
             game.updateStatBars();
             //if you die, this
             if(game.player.HP <= 0){
+                clearInterval(game.pTimeVar);                
                 clearInterval(game.cpu);
                 clearInterval(game.eTimeVar);                                
                 game.battleWon(game.characterSelect, "You lost", 'player');
             //if you win a battle, this
             } else if(game.currentOpponent.HP <= 0) {
+                clearInterval(game.pTimeVar);                
                 clearInterval(game.cpu);
                 clearInterval(game.eTimeVar);                
                 //delete this char from opponents
