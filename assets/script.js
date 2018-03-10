@@ -78,8 +78,10 @@ var charList = {
             },
         },
         story: {
-			backStory: "You remember that you are Mance Krauss, a knight of Erdwynn, and first sword of the kingdom of Sommer's Glen.</p><p>During the Seven Year War, your king ordered you abandon your post to escort his winemaker to the vineyard beyond the castle walls. Though you acted according to your king, when you abandoned your post, a raiding party slipped through the gates and infiltrated the palace. Sparing the king to use as a hostage, they murdered the rest of the royal family. The king was made to order the opening of Sommer's Glen's main gate, allowing the invading army of Belan to sieze control of the castle and the realm. Your brothers in arms were executed and the kingdom conquered by the time you returned with the casks of wine you were sent for.</p><p>Despite murdering the winemaker for convincing the king of ordering such a fool's errand, there was nothing else you could do. Facing certain death at the hands of your enemies, or disgrace, you chose to survive and fled the realm.</p><p>Since entering your exile, you have roamed the lands in search of appropriate penance and some kind of peace. Your search led you to the forests of Nerdim and now here...",
-			},//END STORY
+            backStory: "You remember that you are Mance Krauss, a knight of Erdwynn, and first sword of the kingdom of Sommer's Glen.</p><p>During the Seven Year War, your king ordered you abandon your post to escort his winemaker to the vineyard beyond the castle walls. Though you acted according to your king, when you abandoned your post, a raiding party slipped through the gates and infiltrated the palace. Sparing the king to use as a hostage, they murdered the rest of the royal family. The king was made to order the opening of Sommer's Glen's main gate, allowing the invading army of Belan to sieze control of the castle and the realm. Your brothers in arms were executed and the kingdom conquered by the time you returned with the casks of wine you were sent for.</p><p>Despite murdering the winemaker for convincing the king of ordering such a fool's errand, there was nothing else you could do. Facing certain death at the hands of your enemies, or disgrace, you chose to survive and fled the realm.</p><p>Since entering your exile, you have roamed the lands in search of appropriate penance and some kind of peace. Your search led you to the forests of Nerdim and now here...",
+            loseText: "",
+            winText: "I am duh best knight",
+        },//END STORY
         imgSrcLeft:'./assets/images/char6left.png',
         imgSrcRight:'./assets/images/char6right.png',
     },
@@ -120,6 +122,8 @@ var charList = {
         },
         story: {
             backStory: "",
+            loseText: "",
+            winText: "",
         },
         imgSrcLeft:'./assets/images/char2left.png',
         imgSrcRight:'./assets/images/char2right.png',
@@ -149,6 +153,8 @@ var charList = {
         },
         story: {
             backStory: "",
+            loseText: "I am duh worst rogue",
+            winText: "",
         },
         imgSrcLeft:'./assets/images/char3left.png',
         imgSrcRight:'./assets/images/char3right.png',
@@ -186,6 +192,8 @@ var charList = {
         },
         story: {
             backStory: "",
+            loseText: "",
+            winText: "",
         },
         imgSrcLeft:'./assets/images/char4left.png',
         imgSrcRight:'./assets/images/char4right.png',
@@ -338,11 +346,12 @@ function turn(char, opponent, act) {
     //stunned
     if(char.stunCounter <= 0) {
         delete char.stunCounter;
+		printC(cpu.name + " is no longer stunned!");        
     }
     if(char.stunCounter > 0) {
         char.stunCounter--;
         printC(char.name + " is stunned and cannot move!");
-        cpuTurn(opponent, char);
+        return;
     }
     //technically, this is unnecessary, but I'm checking anyway
     let x = Object.keys(char.actions);
@@ -568,7 +577,7 @@ function kick(attacker, defender) {
 
 function stun(attacker, defender) {
 	if(roll(20) + mod(defender.constitution) > 12 + mod(attacker.strength)) {
-    defender.stunCounter = roll(4) + attacker.dmgBns;
+    defender.stunCounter = roll(4);
     printC(defender.name + " is stunned!");
 	} else {
 		printC(defender.name + " resists stun!");
@@ -865,7 +874,7 @@ $(document).ready(function () {
                 clearInterval(game.pTimeVar);                
                 clearInterval(game.cpu);
                 clearInterval(game.eTimeVar);                                
-                game.battleWon(game.characterSelect, "You lost", 'player');
+                game.battleWon(game.characterSelect, game.player.story.loseText, 'player');
             //if you win a battle, this
             } else if(game.currentOpponent.HP <= 0) {
                 clearInterval(game.pTimeVar);                
@@ -890,11 +899,11 @@ $(document).ready(function () {
                 game.player = copy(game.playerProto);
                 //pick next dewd
                 if(game.foeCounter > 0) {
-                    game.battleWon(game.enemyChoose, 'Defeated text here', 'foe');
+                    game.battleWon(game.enemyChoose, game.currentOpponent.story.loseText, 'foe');
                 }
                 //if no more dudes, this
                 if (game.foeCounter == 0) {
-                    game.battleWon(game.characterSelect, "You Won dewd", 'player');
+                    game.battleWon(game.characterSelect, game.player.story.winText, 'player');
                 }
             }
         },
