@@ -1,63 +1,8 @@
-/*
-1) First, player reads some intro text that leads to the choice of the fighting char
-
-2) four pictures are displayed on screen for player to choose from, player chooses one
-text displayed and then char must click button at bottom to confirm
-
-3) when player chooses a character, More text explaining the situation that character must fight other characters
-
-4) that character's pic is displayed and remaining characters are shown
-so player can pick an opponent
-
-5) when player chooses an opponent, player portrait is shown along with opponent,
-options given for battle, after defeat, some text shown, then go to 4), 
-if no more opponents, go to 6)
-
-6) winning ending text, option to play again, go to 2 or 3
-7) losing text, asked to play again, go to 2 or 3
-
-*/
-
-//initial page load can have intro text and button to begin
-
-//function to select character
-
-//function to reset everything
-
-//play function will start at step 3
-
-/*battle function takes (attacker, defender, action), (cpu, player, action) or (player, cpu, action)
-
-function attack(){
- roll20();
-  compare roll against defender.ac
-  if hit, attacker.successfulAttackText
-  defender.name takes blah points of dmg
-  if miss, 
-}    
-*/
-
-/*
-var charObject = {
-    name: blahblah,
-    hp: 10
-    strength: 10
-    AC: 10
-    playerImgSrc: facing right
-    opponentImgSrc: facing left
-    actions: {
-        autoAttack: attack();
-    }
-    
-}
-*/
-var lorem = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem veritatis nihil magnam. Repellat eligendi, ipsa facere quas laudantium repudiandae nostrum harum deleniti amet officiis, laboriosam aperiam doloremque, officia ex iure. Quisquam sapiente iure libero quae obcaecati, at nobis temporibus sunt possimus distinctio assumenda a. Natus officiis molestias incidunt deserunt quam reprehenderit repudiandae pariatur vero corporis dolores rem, harum esse modi. Ullam, veritatis velit nulla vitae repellat eaque sint officiis delectus. Pariatur commodi, in ratione, modi sapiente quidem delectus cupiditate ullam vero ducimus exercitationem excepturi aut distinctio error perspiciatis nostrum voluptatibus! Dicta, est! Neque labore facilis harum nisi inventore, atque exercitationem porro non, earum ea, in distinctio? Totam, voluptate fuga! Quia ipsam corrupti accusantium alias unde eius quaerat! Distinctio, nobis labore! Culpa dolore voluptates excepturi, incidunt iure ad mollitia voluptatum animi similique impedit nisi voluptas quod doloribus error vero sapiente ab eveniet. Doloribus veritatis quod dicta optio ab sunt excepturi sapiente. Autem facere eaque sed. Possimus cum tempore quasi provident necessitatibus in culpa non odit magnam fugit unde animi totam quam esse accusantium, perferendis qui quos illum iure dolores vel molestiae. Nam adipisci eum architecto, placeat voluptate obcaecati ipsum odio labore sint nemo earum impedit asperiores et, pariatur cumque natus. Similique praesentium tenetur inventore itaque asperiores temporibus voluptates nemo odio vel. Architecto dolore suscipit, eos et atque id enim corrupti numquam tempora, molestias animi ab quasi, in veniam tempore impedit saepe eligendi doloribus. Aliquam totam voluptatum dolor eos, ea placeat quisquam. Est, et necessitatibus unde soluta suscipit accusamus, placeat cum maiores modi quasi alias? Modi aliquid natus dignissimos praesentium, dolorum beatae amet sequi a fugiat explicabo totam ratione velit minima sapiente? Ipsam delectus rem mollitia accusamus sapiente dolorum reprehenderit itaque minus quasi ipsum nulla rerum, a numquam consequuntur maiores quos odio, maxime cum odit nisi veniam architecto sunt! Adipisci, velit dolore!";
+var preFight = "</p><p>The announcer calls out with a bellow, \"Let the games begin!. Contestants, choose your opponents wisely. Only one of you may ever leave this arena alive!";
 
 function printC (str) {
     str = str + '<br>';
     $('#combatText').append(str);
-    // let element = $('#combatText');
-    // element.scrollTop = element.scrollHeight;
 }
 
 //roll dice!
@@ -133,7 +78,7 @@ var charList = {
             },
         },
         story: {
-			backStory: "As you come to, you remember that you are Mance Krauss, a knight of Erdwynn, and sworn to protect the kingdom of ",
+			backStory: "You remember that you are Mance Krauss, a knight of Erdwynn, and first sword of the kingdom of Sommer's Glen.</p><p>During the Seven Year War, your king ordered you abandon your post to escort his winemaker to the vineyard beyond the castle walls. Though you acted according to your king, when you abandoned your post, a raiding party slipped through the gates and infiltrated the palace. Sparing the king to use as a hostage, they murdered the rest of the royal family. The king was made to order the opening of Sommer's Glen's main gate, allowing the invading army of Belan to sieze control of the castle and the realm. Your brothers in arms were executed and the kingdom conquered by the time you returned with the casks of wine you were sent for.</p><p>Despite murdering the winemaker for convincing the king of ordering such a fool's errand, there was nothing else you could do. Facing certain death at the hands of your enemies, or disgrace, you chose to survive and fled the realm.</p><p>Since entering your exile, you have roamed the lands in search of appropriate penance and some kind of peace. Your search led you to the forests of Nerdim and now here...",
 			},//END STORY
         imgSrcLeft:'./assets/images/char6left.png',
         imgSrcRight:'./assets/images/char6right.png',
@@ -172,6 +117,9 @@ var charList = {
                 printA(attacker, "Arcane Protection", 'MP');
                 barrier(attacker, defender);
             },
+        },
+        story: {
+            backStory: "",
         },
         imgSrcLeft:'./assets/images/char2left.png',
         imgSrcRight:'./assets/images/char2right.png',
@@ -635,7 +583,7 @@ $(document).ready(function () {
             let intro = $('<h1>');
             intro.attr("id", "instr")
                 .attr("class", "instr")
-                .text("Choose your Character");
+                .text("Who are you?");
             $('body').append(intro);
             //get img for each char
             let charSelDiv = $('<div>');
@@ -674,7 +622,7 @@ $(document).ready(function () {
             let a = Object.keys(game.chars);
             game.foeCounter = a.length;
             $('body').fadeOut('slow', function (){
-                $('body').fadeIn('slow', game.storyPage(game.enemyChoose, "story shiz goes here, about like, how there's like, an arena and shit and you gotta fight some guys.", 'player'));
+                $('body').fadeIn('slow', game.storyPage(game.enemyChoose, game.player.story.backStory + preFight, 'player'));
             });
 
         },//end playerChoose
@@ -992,7 +940,7 @@ $(document).ready(function () {
                             });
                         }).appendTo('#storyPageDiv');
         }, //end storyPage
-    intro: "The arena is filled with cheering spectators in strange dress. Airships float through the sky above the arena filled with more spectators. You marvel at the flying ships; you didn't know such machinations were possible. Looking past the crowd, you see tall buildings with strange architecture that jut into the sky just beyond the stands. The arena is situated in the middle of a city of such buildings. You realize that you are far, far away from home.</p><p>In the middle of the stands, from the section you assume would be reserved for royalty steps a figure wearing heavy armor and carrying a massive sword.</p><p>A hush falls over the crowd.</p><p>The figure says, \"Welcome! For the entertainment of you, our guests, we have prepared this glorious display of valor and blood. This melee we dedicate to Innovar, lord of the Umbral plane, in celebration of his works!\"</p><p>The crowd cheers more raucously than before, but the armored man raises his hand to silence the onlookers.</p><p>\"For this season's tribute, we have scoured the material planes in search of worthy contestants for Innovar's blessing. With pleasure, I introduce our tournament's contestants!\"</p><p>The man gestures to the arena where you stand, and for the first time you realize that you are not alone in the arena. You can see that there are other contestants wearing stunned and confused looks that match your own.</p><p>The announcer continues, \"First we have the Dishonorable Knight. The greatest sword of his order, but sole survivor of the fall of the kingdom of Sommer's Glen. Now a disgraced vagabond.\"</p><p>\"Next, I present the Soulless Sorceress. Without caution, she bartered her soul to the demon Valefor in exchange for Arcane might.\"</p><p>\"Third is the Hedonistic Assassin. Untainted by guilt or remorse, he leaves bodies and sorrow in the wake of his pursuit of riches and women.\"</p><p>\"Last is the Faithless Ascetic, a monk of the highest martial prowess. Abandoning his order and his God, he wanders the planes in search of his own truth.\"</p><p>The words of the announcer sting you, and the pain makes you finally remember who you are...",
+    intro: "The arena is filled with cheering spectators in strange dress. Airships float through the sky above the arena filled with more spectators. You marvel at the flying ships; you didn't know such machinations were possible. Looking past the crowd, you see tall buildings with strange architecture that jut into the sky just beyond the stands. The arena is situated in the middle of a city of such buildings. You realize that you are far, far away from home.</p><p>In the middle of the stands, from the section you assume would be reserved for royalty steps a figure wearing heavy armor and carrying a massive sword.</p><p>A hush falls over the crowd.</p><p>The figure says, \"Welcome! For the entertainment of you, our guests, we have prepared this glorious display of valor and blood. This melee we dedicate to Innovar, lord of the Umbral plane, in celebration of his works!\"</p><p>The crowd cheers more raucously than before, but the armored man raises his hand to silence the onlookers.</p><p>\"For this season's tribute, we have scoured the material planes in search of worthy contestants for Innovar's blessing. With pleasure, I introduce our tournament's contestants!\"</p><p>The man gestures to the arena where you stand, and for the first time you realize that you are not alone in the arena. You can see that there are other contestants wearing stunned and confused looks that match your own.</p><p>The announcer continues, \"First we have the Dishonorable Knight. The greatest sword of his order, but sole survivor of the fall of his realm. Now a disgraced vagabond.\"</p><p>\"Next, I present the Soulless Sorceress. Without caution, she bartered her soul to the demon Valefor in exchange for Arcane might.\"</p><p>\"Third is the Hedonistic Assassin. Untainted by guilt or remorse, he leaves bodies and sorrow in the wake of his pursuit of riches and women.\"</p><p>\"Last is the Faithless Ascetic, a monk of the highest martial prowess. Abandoning his order and his God, he wanders the planes in search of his own truth.\"</p><p>The words of the announcer sting you, and the pain makes you finally remember who you are...",
 
     }//end game obj
 
