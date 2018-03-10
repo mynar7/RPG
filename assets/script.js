@@ -890,7 +890,7 @@ $(document).ready(function () {
                 game.player = copy(game.playerProto);
                 //pick next dewd
                 if(game.foeCounter > 0) {
-                    game.battleWon(game.enemyChoose, lorem, 'foe');
+                    game.battleWon(game.enemyChoose, 'Defeated text here', 'foe');
                 }
                 //if no more dudes, this
                 if (game.foeCounter == 0) {
