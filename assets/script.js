@@ -147,6 +147,9 @@ var charList = {
                 kick(attacker, defender);
             },
         },
+        story: {
+            backStory: "",
+        },
         imgSrcLeft:'./assets/images/char3left.png',
         imgSrcRight:'./assets/images/char3right.png',
     },
@@ -180,6 +183,9 @@ var charList = {
                     attacker.SP = 0;
                 }
             }, 
+        },
+        story: {
+            backStory: "",
         },
         imgSrcLeft:'./assets/images/char4left.png',
         imgSrcRight:'./assets/images/char4right.png',
