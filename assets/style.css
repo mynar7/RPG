@@ -2,16 +2,26 @@ body {
     font-family: arial;
     margin: auto;
     max-width: 960px;
-    /* background-image: url(./images/floatingCastle.jpg); */
+    background-image: url('./images/floatingCastle.jpg');
+    background-position: top;
 }
-.storySetup {
-    max-width: 80%;
-    margin: 20px auto;
-    background-color: rgba(255, 255, 255, 0.59);
-    box-shadow: 10px 10px 10px #ffffff30;
 
+.initial {
+    background-image: url('./images/forest.jpg');
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
 }
-.storySetup>p {
+
+.storySetup, .storyPageDiv {
+    max-width: 960px;
+    margin: 20px auto;
+    background-color: rgba(255, 255, 255, 0.527);
+    box-shadow: 10px 10px 10px rgba(192, 190, 190, 0.59);
+}
+.storySetup>p, .storyPageDiv>p {
     padding: 5px 15px;
     text-indent: 2em;
     line-height: 1.5em;
@@ -22,26 +32,63 @@ body {
     display: block;
     margin: 20px auto;
 }
-/* story btn */
+/* text above char choices */
 .instr {
     text-align: center;
+    color: white;
+    margin: 20px;
 }
 .charPics {
     background-color: rgba(88, 89, 93, 0.609);
     height: 350px;
+    background-image: url('./images/cyprus.jpg');
+    background-position: bottom;
+    background-size: cover;
+    border: 10px rgb(214,209,189) ridge;    
+}
+
+.charPics img {
+    margin-top: 40px;
+}
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: rgb(117, 93, 115); 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: rgb(82, 62, 80);
+
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(71, 52, 70); 
+}
+.combatTextContainer {
+    background-image: url('./images/black.jpg');
+    background-position: bottom;
+    width: 80%;
+    margin: auto;
+    border: 10px rgb(214,209,189) ridge;
+    border-top: none;
+    clear:both;
 }
 .combatText {
-    /* background-image: url('./images/rockywall.png'); */
-    clear:both;
+    margin: 0 0 5px 15px;   
+    color: beige;    
     height: 180px;
-    border: 10px rgb(224, 224, 224) ridge;
     /* makes the scroll bar stay at the bottom */
     overflow: auto;
     display: flex;
     flex-direction: column-reverse;
 }
 .charSelDiv {
-    
     /* center imgs in this div */
     display: flex;
     align-items: center;
@@ -58,7 +105,7 @@ body {
 }
 .enemies {
     clear: both;
-    background-color: rgb(88, 89, 93);
+    background-color: rgba(121, 118, 118, 0.726);
     /* center imgs in this div */
     display: flex;
     align-items: center;
@@ -107,7 +154,6 @@ body {
     border-bottom-right-radius: 0px;
     padding-bottom: 5px;
     float: right;
-    margin: auto 0;
 }
 
 .playerHP, .enemyHP {
@@ -153,8 +199,11 @@ body {
     padding-bottom: 5px;
 }
 
-.foeStoryPic {
+.enemyStoryPic {
     float: right;
+}
+.playerStoryPic {
+    float: left;
 }
 /* battle and story pg btn container */
 .actionBtns {

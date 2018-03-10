@@ -81,9 +81,9 @@ var charList = {
         damage: 7,
         dmgBns: 4,
         strength: 16,
-        dexterity: 9,
+        dexterity: 14,
         constitution: 15,
-        intelligence: 13, 
+        intelligence: 9, 
         wisdom: 11,
         charisma: 14,
         speed: 40,
@@ -106,14 +106,14 @@ var charList = {
                     attacker.AC-=6;
                     attacker.damage+=mod(attacker.strength);
                     attacker.dmgBns+=mod(attacker.strength);
-                    attacker.dexterity+=mod(attacker.strength);
+                    attacker.dexterity+=mod(attacker.strength) * 2;
                 }
                 if(attacker.stance === 'defensive') {
                     attacker.stance = 'offensive';
                     printC(attacker.name + ' assumes an offensive stance!');                    
                     attacker.AC-=12;
-                    attacker.damage+=mod(attacker.strength) * 2;
-                    attacker.dmgBns+=mod(attacker.strength) * 2;
+                    attacker.damage+=mod(attacker.strength);
+                    attacker.dmgBns+=mod(attacker.strength);
                 }
             },
             Guard_Stance: function(attacker) {
@@ -121,22 +121,20 @@ var charList = {
                     attacker.stance = 'defensive';
                     printC(attacker.name + ' assumes a defensive stance!');
                     attacker.AC+=6;
-                    attacker.damage-=mod(attacker.strength);
-                    attacker.dmgBns-=mod(attacker.strength);
                 }
                 if(attacker.stance === 'offensive') {
                     attacker.stance = 'defensive';
                     printC(attacker.name + ' assumes a defensive stance!');
                     attacker.AC+=12;
-                    attacker.damage-=mod(attacker.strength) * 2;
-                    attacker.dmgBns-=mod(attacker.strength) * 2;
-                    attacker.dexterity-=mod(attacker.strength);
+                    attacker.damage-=mod(attacker.strength);
+                    attacker.dmgBns-=mod(attacker.strength);
+                    attacker.dexterity-=mod(attacker.strength) * 2;
                 }
-            }, //END ACTIONS
-		story: {
+            },
+        },
+        story: {
 			backStory: "As you come to, you remember that you are Mance Krauss, a knight of Erdwynn, and sworn to protect the kingdom of ",
 			},//END STORY
-        },
         imgSrcLeft:'./assets/images/char6left.png',
         imgSrcRight:'./assets/images/char6right.png',
     },
@@ -146,7 +144,7 @@ var charList = {
         HP: 78,
         AC: 9,
         MP: 10,
-        SP: 1,
+        SP: 4,
         damage: 6, //+3. but 1d10 flat with fireball
         dmgBns: 4,
         strength: 10,
@@ -156,14 +154,15 @@ var charList = {
         wisdom: 13,
         charisma: 8,
         speed: 30,
-        channelCounter: 0,
         actions: {
             Gather_Mana: manaRecover,
             Arcane_Bolt: function(attacker, defender) {
                 printA(attacker, "Arcane Bolt", 'MP');
                 fireball(attacker, defender);
             },
-            Channel: channel,
+            Channel: function(attacker){
+                channel(attacker, mod(attacker.intelligence));
+            },
             Arcane_Volley: function (attacker, defender) {
                 printA(attacker, "Arcane Volley", 'MP');
                 magicMissles(attacker, defender);
@@ -209,7 +208,7 @@ var charList = {
         HP: 85,
         AC: 12,
         MP: 0,
-        SP: 0,
+        SP: 4,
         damage: 4,
         dmgBns: 2,
         strength: 8,
@@ -219,21 +218,58 @@ var charList = {
         wisdom: 14,
         charisma: 12,
         speed: 20,
-        channelCounter: 0,
         actions: {
-            Focus: channel,
+            Focus: function(attacker){
+                channel(attacker, mod(attacker.wisdom));
+            },
             Double_Strike: function(attacker, defender) {
                 multiAttack(attacker, defender, 2);
             },
             Punishing_Fists: function (attacker, defender) {
-                printA(attacker, 'Punishing Fists!');
-                multiAttack(attacker, defender, attacker.channelCounter + 2);
-                attacker.channelCounter = 0;
+                printA(attacker, 'Punishing Fists!', 'SP');
+                if(attacker.SP > 0) {
+                    multiAttack(attacker, defender, roll(attacker.SP + mod(attacker.wisdom)));
+                    attacker.SP = 0;
+                }
             }, 
         },
         imgSrcLeft:'./assets/images/char4left.png',
         imgSrcRight:'./assets/images/char4right.png',
     }
+}
+
+var boss = {
+    name: 'Atlas',
+    HP: 185,
+    AC: 13,
+    MP: 0,
+    SP: 4,
+    damage: 4,
+    dmgBns: 2,
+    strength: 8,
+    dexterity: 17,
+    constitution: 14,
+    intelligence: 10, 
+    wisdom: 14,
+    charisma: 12,
+    speed: 20,
+    actions: {
+        Focus: function(attacker){
+            channel(attacker, mod(attacker.wisdom));
+        },
+        Double_Strike: function(attacker, defender) {
+            multiAttack(attacker, defender, 2);
+        },
+        Punishing_Fists: function (attacker, defender) {
+            printA(attacker, 'Punishing Fists!', 'SP');
+            if(attacker.SP > 0) {
+                multiAttack(attacker, defender, roll(attacker.SP + mod(attacker.wisdom)));
+                attacker.SP = 0;
+            }
+        }, 
+    },
+    imgSrcLeft:'./assets/images/char1left.png',
+    imgSrcRight:'./assets/images/char1right.png',
 }
 
 //super important for deep copy! Thanks stack overflow!
@@ -365,9 +401,6 @@ function turn(char, opponent, act) {
 
     afterTurn(char);
     afterTurn(opponent);
-    printC('{---------------------------------------------------}');
-    
-    
 }
 
 function cpuTurn(cpu, target) {
@@ -392,8 +425,6 @@ function cpuTurn(cpu, target) {
     a(cpu, target);
     afterTurn(cpu);
     afterTurn(target);
-    printC('{---------------------------------------------------}');
-    
 }
 
 //basic attack fx
@@ -519,17 +550,26 @@ function manaRecover (attacker, defender) {
     }
 }
 
-function channel(attacker) {
-    printC(attacker.name + ' focuses their energy!');
-    attacker.channelCounter+=2;
-    printC(attacker.name + ' has ' + attacker.channelCounter + ' charges');
+function channel(attacker, charges) {
+    if(attacker.SP < attacker.maxSP) {
+        printC(attacker.name + ' focuses their energy!');        
+        //determine MP recovered
+        let plusSP = charges;
+        //if more than Max, set to maxMP
+        if(attacker.maxSP < attacker.SP + plusSP) {
+            attacker.SP = attacker.maxSP;
+            //else add it
+        } else {
+            attacker.SP += plusSP;
+        }
+    }
 }
 
 function magicMissles(attacker, defender) {
-    if(attacker.MP >= 2) {
+    if(attacker.MP >= 2 && attacker.SP > 0) {
         let dmg = 0;
         let bolts = 0;
-        for(i = 0; i < attacker.channelCounter; i++) {
+        for(i = 0; i < attacker.SP; i++) {
             if (roll(20) + mod(attacker.intelligence) > defender.AC) {
                 dmg += roll(attacker.damage) + mod(attacker.intelligence) + attacker.dmgBns;
                 bolts++;
@@ -537,13 +577,13 @@ function magicMissles(attacker, defender) {
         }
         if(dmg > 0) {
             defender.HP -= dmg;
-            printC(defender.name + ' is hit by ' + bolts + ' out of '+ attacker.channelCounter +  ' bolts!');
+            printC(defender.name + ' is hit by ' + bolts + ' out of '+ attacker.SP +  ' bolts!');
             printC(defender.name + ' takes ' + dmg + ' points of damage!');
         } else {
             printC(defender.name + ' narrowly avoids all of arcane bolts!');
         }
-        attacker.channelCounter = 0;
-        attacker.MP-=2;
+        attacker.SP = 0;
+        attacker.MP -= 2;
     }
 }
 
@@ -574,7 +614,7 @@ function kick(attacker, defender) {
 
 function stun(attacker, defender) {
 	if(roll(20) + mod(defender.constitution) > 12 + mod(attacker.strength)) {
-    defender.stunCounter = roll(4);
+    defender.stunCounter = roll(4) + attacker.dmgBns;
     printC(defender.name + " is stunned!");
 	} else {
 		printC(defender.name + " resists stun!");
@@ -633,7 +673,9 @@ $(document).ready(function () {
             //create a counter for the remaining enemies
             let a = Object.keys(game.chars);
             game.foeCounter = a.length;
-            game.storyPage(game.enemyChoose, "story shiz goes here, about like, how there's like, an arena and shit and you gotta fight some guys.");
+            $('body').fadeOut('slow', function (){
+                $('body').fadeIn('slow', game.storyPage(game.enemyChoose, "story shiz goes here, about like, how there's like, an arena and shit and you gotta fight some guys.", 'player'));
+            });
 
         },//end playerChoose
 
@@ -713,20 +755,24 @@ $(document).ready(function () {
             $('<h4>').attr("id", "enemyTime").attr("class", "enemyTime").appendTo('#enemyDiv');
             $('<h3>').attr("id", "enemyTimeNum").attr("class", "enemyTimeNum").text('Time').appendTo('#enemyDiv');
             //remove enemy pics
-            $('#enemies').remove();
-            $('#instr').remove();
-            //add div for combat text
-            let textBox = $('<div>').attr("id", "combatText").attr("class", "combatText");
-            $('body').append(textBox);
-            //add div for btns
-            let actionBtns = $('<div>').attr("id", "actionBtns").attr("class", "actionBtns");
-            $('body').append(actionBtns);
-            game.drawButtons();
+            $('#instr').fadeOut('slow');
+            $('#enemies').fadeOut('slow', function(){
+                $('#enemies').remove();
+                $('#instr').remove();
+                
+                //add div for combat text
+                $('<div>').attr("id", "combatTextContainer").attr("class", "combatTextContainer").appendTo('body');            
+                $('<div>').attr("id", "combatText").attr("class", "combatText").appendTo('#combatTextContainer');
+                //add div for btns
+                $('<div>').attr("id", "actionBtns").attr("class", "actionBtns").appendTo('body');
+                game.drawButtons();
+            });
             game.battleStarted = false;
         },//end enterBattle
 
         drawButtons: function() {
-            $('#actionBtns').empty();
+            $('#actionBtns').hide();
+            $('#combatTextContainer').hide();
             //populate action buttons with a fx for char's actions
             let act = Object.keys(game.player.actions);
             for(i = 0; i < act.length; i++){
@@ -757,6 +803,8 @@ $(document).ready(function () {
                     });
                 $('#actionBtns').append(btn);
             }//end for lp
+            $('#actionBtns').fadeIn('slow');
+            $('#combatTextContainer').fadeIn('slow');
             
         },//end drawButtons
         //update player time Bar
@@ -888,7 +936,7 @@ $(document).ready(function () {
                 game.player = copy(game.playerProto);
                 //pick next dewd
                 if(game.foeCounter > 0) {
-                    game.battleWon(game.enemyChoose , lorem, 'foe');
+                    game.battleWon(game.enemyChoose, lorem, 'foe');
                 }
                 //if no more dudes, this
                 if (game.foeCounter == 0) {
@@ -901,13 +949,7 @@ $(document).ready(function () {
         //also removes action buttons and attaches continue button linking to story page
         battleWon: function(fx, str, pic) {
             $('#actionBtns').empty();
-            let a;
-        
-            if(pic == 'player') {
-                a = game.storyPage;
-            } else {
-                a = game.storyPageFoe;
-            }
+            
             if(game.player.HP > 0) {
                 printC(game.player.name + " defeated " + game.currentOpponent.name + '!');
             } else if (game.currentOpponent.HP > 0) {
@@ -916,63 +958,48 @@ $(document).ready(function () {
                 printC(game.player.name + " and " + game.currentOpponent.name + ' defeated each other!');                
             }
             let x = $('<button>').attr('id', 'Continue').text('Continue').on("click", function(){
-                a(fx, str);
+                    $('body').fadeOut('slow', function(){
+                        game.storyPage(fx, str, pic);
+                        $('body').fadeIn('slow');
+                    });
             });
-
             $('#actionBtns').append(x)
 
         },
 
-        storyPage: function (fx, str) {
+        storyPage: function (fx, str, pic) {
             //this chunk draws player in left corner with text
             $('body').empty();
-            /*
-            let a = $('<div>');
-            a.attr("id", "charPics").attr("class", "charPics");
-            $('body').append(a);
-            */
-            $('body').append($('<img>')
-                            .attr("src", game.player.imgSrcRight)
-                            .attr("id", "player")
-                        );//end append
-            $('body').append($('<p>')
-                        .text(str));
-            $('body').append($('<button>')
-                        .attr("id", "Continue")
-                        .text("Continue")
-                        .on("click", function(){
-                            fx();
-                        })
-                    );//end append
+            $('<div>').addClass("storyPageDiv").attr("id", "storyPageDiv").appendTo('body');
+            switch (pic) {
+                case 'player':
+                    $('<img>').attr("src", game.player.imgSrcRight).attr("id", "player").addClass('playerStoryPic').appendTo('#storyPageDiv');
+                break;
+                case 'foe':
+                    $('<img>').attr("src", game.currentOpponent.imgSrcLeft).attr("id", "enemy").addClass('enemyStoryPic').appendTo('#storyPageDiv');
+                break;
+                case 'boss':
+                    $('<img>').attr("src", boss.imgSrcLeft).attr("id", "enemy").addClass('enemyStoryPic').appendTo('#storyPageDiv');                    
+                break;
+            }
+            $('<p>').html(str).appendTo('#storyPageDiv');
+            $('<button>').attr("id", "Continue").text("Continue")
+                        .on("click", function() {
+                            $('body').fadeOut('slow', function(){
+                                fx();
+                                $('body').fadeIn('slow');
+                            
+                            });
+                        }).appendTo('#storyPageDiv');
         }, //end storyPage
-
-        storyPageFoe: function (fx, str) {
-            $('body').empty();
-            //this chunk draws player in left corner with text
-            /*
-            let a = $('<div>');
-            a.attr("id", "charPics").attr("class", "charPics");
-            $('body').append(a);
-            */
-            $('body').append($('<img>')
-                            .attr("class", 'foeStoryPic')
-                            .attr("src", game.currentOpponent.imgSrcLeft)                            
-                        );//end append
-            $('body').append($('<p>')
-                        .text(str));
-            $('body').append($('<button>')
-                        .attr("id", "Continue")
-                        .text("Continue")
-                        .on("click", function(){
-                            fx();
-                        })
-                    );//end append
-        }, //end storyPage
+    intro: "The arena is filled with cheering spectators in strange dress. Airships float through the sky above the arena filled with more spectators. You marvel at the flying ships; you didn't know such machinations were possible. Looking past the crowd, you see tall buildings with strange architecture that jut into the sky just beyond the stands. The arena is situated in the middle of a city of such buildings. You realize that you are far, far away from home.</p><p>In the middle of the stands, from the section you assume would be reserved for royalty steps a figure wearing heavy armor and carrying a massive sword.</p><p>A hush falls over the crowd.</p><p>The figure says, \"Welcome! For the entertainment of you, our guests, we have prepared this glorious display of valor and blood. This melee we dedicate to Innovar, lord of the Umbral plane, in celebration of his works!\"</p><p>The crowd cheers more raucously than before, but the armored man raises his hand to silence the onlookers.</p><p>\"For this season's tribute, we have scoured the material planes in search of worthy contestants for Innovar's blessing. With pleasure, I introduce our tournament's contestants!\"</p><p>The man gestures to the arena where you stand, and for the first time you realize that you are not alone in the arena. You can see that there are other contestants wearing stunned and confused looks that match your own.</p><p>The announcer continues, \"First we have the Dishonorable Knight. The greatest sword of his order, but sole survivor of the fall of the kingdom of Sommer's Glen. Now a disgraced vagabond.\"</p><p>\"Next, I present the Soulless Sorceress. Without caution, she bartered her soul to the demon Valefor in exchange for Arcane might.\"</p><p>\"Third is the Hedonistic Assassin. Untainted by guilt or remorse, he leaves bodies and sorrow in the wake of his pursuit of riches and women.\"</p><p>\"Last is the Faithless Ascetic, a monk of the highest martial prowess. Abandoning his order and his God, he wanders the planes in search of his own truth.\"</p><p>The words of the announcer sting you, and the pain makes you finally remember who you are...",
 
     }//end game obj
 
     $('#initial').on("click", "#start", function() {
-        game.characterSelect();
+        $('body').fadeOut('slow', function(){
+            $('body').fadeIn('slow', game.storyPage(game.characterSelect, game.intro, 'boss'));
+        });
     });
     
 });
