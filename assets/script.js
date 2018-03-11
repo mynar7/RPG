@@ -263,7 +263,7 @@ var boss = {
     },
     story: {
         preFight: "The announcer leaps from his place in the stands down into the arena before you.</p><p>A hush falls over the crowd and he says, \"Well-met champion! You have given us a marvelous show this day!\"</p><p>He draws his sword and points it at you.</p><p>\"Pray tell, though, Champion, did you expect to leave here with your life? All are tribute to Innovar, and you are no different.\"</p><p>You steel yourself for the final battle, summoning what's left of your strength.",
-        postFight: "The announcer, mortally wounded but still compelled to get the last word, says, \"You think you've won the day... Fool. May Innovar feast your essence for a thousand years.\"</p><p>He chokes on his words and heaves a final, labored breath before collapsing in a heap on the ground.",
+        postFight: "The announcer, mortally wounded but still compelled to get the last word, says, \"You think you've won the day... Fool. May Innovar feast on your essence for a thousand years.\"</p><p>He chokes on his words and heaves a final, labored breath before collapsing in a heap on the ground.",
     },
     imgSrcLeft:'./assets/images/char1left.png',
     imgSrcRight:'./assets/images/char1right.png',
