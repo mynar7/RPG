@@ -27,18 +27,18 @@ var charList = {
         dmgBns: 4,
         strength: 16,
         dexterity: 14,
-        constitution: 15,
+        constitution: 18,
         intelligence: 9, 
         wisdom: 11,
         charisma: 14,
-        speed: 40,
+        speed: 38,
         actions: {
             Attack: function(attacker, defender) {
                 attackIt(attacker, defender);
             },
             Rest: skillRecover,
             Double_Slash: function(attacker, defender) {
-                printA(attacker, 'Double Slash', 'SP');
+                printA(attacker, 'Double Slash', 'SP', 1);
                 if(attacker.SP >= 1) {
                     multiAttack(attacker, defender, 2);
                     attacker.SP--;
@@ -87,34 +87,34 @@ var charList = {
     char2: {
         name: 'Sorcerer',
         HP: 78,
-        AC: 9,
+        AC: 11,
         MP: 10,
-        SP: 4,
-        damage: 6, //+3. but 1d10 flat with fireball
-        dmgBns: 4,
+        SP: 2,
+        damage: 5, //+3. but 1d10 flat with fireball
+        dmgBns: 5,
         strength: 10,
         dexterity: 16,
         constitution: 12,
-        intelligence: 16, 
+        intelligence: 18, 
         wisdom: 13,
         charisma: 8,
         speed: 30,
         actions: {
             Gather_Mana: manaRecover,
             Arcane_Bolt: function(attacker, defender) {
-                printA(attacker, "Arcane Bolt", 'MP');
+                printA(attacker, "Arcane Bolt", 'MP', 1);
                 fireball(attacker, defender);
             },
             Channel: function(attacker){
-                channel(attacker, mod(attacker.intelligence));
+                channel(attacker, roll(mod(attacker.intelligence)));
             },
             Arcane_Volley: function (attacker, defender) {
-                printA(attacker, "Arcane Volley", 'MP');
+                printA(attacker, "Arcane Volley", 'MP', 2);
                 magicMissles(attacker, defender);
             },
             Dispel_Toxin: curePoison,
             Arcane_Protection: function(attacker, defender) {
-                printA(attacker, "Arcane Protection", 'MP');
+                printA(attacker, "Arcane Protection", 'MP', 3);
                 barrier(attacker, defender);
             },
         },
@@ -129,7 +129,7 @@ var charList = {
     char3: {
         name: 'Rogue',
         HP: 70,
-        AC: 14,
+        AC: 12,
         MP: 0,
         SP: 5,
         damage: 8, //+3? 
@@ -140,14 +140,32 @@ var charList = {
         intelligence: 13, 
         wisdom: 12,
         charisma: 16,
-        speed: 28,
+        speed: 32,
         actions: {
-            Stab: attackIt,
+            Stab: function(attacker, defender) {
+                if(attacker.SP < attacker.maxSP) {
+                    attacker.SP++;
+                }
+                attackIt(attacker, defender);
+            },
             Poison_Strike: poisonAttack,
-            Groin_Kick: function(attacker, defender) {
-                printA(attacker, "Groin Kick", 'SP');
+            Cheap_Shot: function(attacker, defender) {
+                printA(attacker, "Cheap Shot", 'SP', 1);
                 kick(attacker, defender);
             },
+            Backstab: function(attacker, defender) {
+                printA(attacker, "Backstab", 'SP', 2);
+                if(attacker.SP >= 2) {
+                    attacker.SP-=2;
+                    if(roll(20) > defender.AC / 2) {
+                        let dmg = (attacker.dmgBns * 4) + roll(attacker.damage);
+                        defender.HP-=dmg;
+                        printC(defender.name + ' takes ' + dmg + ' points of damage!');
+                    } else {
+                        printC(defender.name + ' dodges the blade!');
+                    }
+                }
+            }
         },
         story: {
             backStory: "You remember that you are Lox Kellan, and you immediately swear that you will never drunkenly decide to travel alone again.</p><p> As the highest paid and most feared Assassin in Freeport, you naturally began to garner more and more enemies. Eventually the attempts on your life began to outweigh the allure Freeport's notoriously beautiful women, and you decided it was time to relocate. So you packed your bags and fled the city under the cover of darkness, stealing nips from your flask as you watched the city disappear over the horizon.</p><p>Accepting only enough work to keep your wallet filled and your flask full, you moved from city to city all across Erthos, leaving numerous dead bodies and discarded maidens in your wake.</p><p>After an altercation in a lowly inn at the end of a night of drinking, you found yourself wandering through Nerdim forest heading towards Fandalin. If it wasn't for your carelessness and inebriation, those thugs never would have gotten the drop on you.</p><p>To make matters worse, you are painfully sober and staring down an awful death participating in some terrible gladiator show.</p><p> Heaving a deep sigh, your hand brushes your coat pocket, and you feel your flask tucked close to your chest. You quickly snatch it out and gulp down the  liquor within. Maybe things aren't so bad after all.",
@@ -163,9 +181,9 @@ var charList = {
         HP: 85,
         AC: 12,
         MP: 0,
-        SP: 4,
+        SP: 2,
         damage: 4,
-        dmgBns: 2,
+        dmgBns: 3,
         strength: 8,
         dexterity: 17,
         constitution: 14,
@@ -173,20 +191,34 @@ var charList = {
         wisdom: 14,
         charisma: 12,
         speed: 20,
+        mended: false,
         actions: {
             Focus: function(attacker){
-                channel(attacker, attacker.dmgBns);
+                channel(attacker, roll(attacker.dmgBns));
             },
             Double_Strike: function(attacker, defender) {
                 multiAttack(attacker, defender, 2);
             },
             Punishing_Fists: function (attacker, defender) {
-                printA(attacker, 'Punishing Fists!', 'SP');
                 if(attacker.SP > 0) {
-                    multiAttack(attacker, defender, roll(attacker.SP + mod(attacker.wisdom)));
+                    multiAttack(attacker, defender, roll(attacker.SP +attacker.dmgBns));
                     attacker.SP = 0;
                 }
-            }, 
+            },
+            Mend: function (attacker, defender) {
+                if (!attacker.mended) {
+                    attacker.mended = true;
+                    attacker.HP += Math.floor(attacker.maxHP / 3);
+                    if(attacker.HP > attacker.maxHP) {
+                        attacker.HP = attacker.maxHP;
+                    }
+                    printC(attacker.name + ' focuses his chi to his wounds!');
+                }
+                else {
+                    printC(attacker.name + ' is out of breath!');
+                    
+                }
+            },
         },
         story: {
             backStory: "You remember that you are Medin of the Empty Hand, disciple of Syr, and master of the martial arts.</p><p>As an orphan, you were taken in by monks from hidden monastery in the Tolsar Mountains and trained in their ways from a young age.</p><p>Each day you spent seven hours tempering your body into a weapon in the service of Syr the Tranquil, and the remaining daylight studying Syr's teachings and maintaining the monastery grounds.</p><p>As you aged, your martial skills continued to develop and even surpass the elder monks.</p><p>At the annual tournament before your eighteenth name day, you competed against your brothers for sport in celebration of Syr and his teachings.</p><p>As you progressed through the rankings, whispers circulated about your love of battle and the severity of the injuries you imposed on your opponents.</p><p>In the final bout, not knowing your own strength, you delivered a lethal blow to your opponent, one of your fellow monks.</p><p>You were exiled from the monastery and forced to denounce yourself before Syr.</p><p>Forced to wander the Earth, shamed and exiled, you brought justice to evildoers and devoted your life to honoring Syr's teachings despite your mistakes.</p><p>Your quest found you in the forest of Nerdim, on your way to Fandalin to ask guidance from Nephilhelm, Syr's most famous disciple. Now you find yourself in another wretched tournament, this time forced to use your fists for bloodshed.",
@@ -208,7 +240,7 @@ var boss = {
     dmgBns: 4,
     strength: 15,
     dexterity: 16,
-    constitution: 15,
+    constitution: 8,
     intelligence: 16, 
     wisdom: 14,
     charisma: 12,
@@ -218,14 +250,14 @@ var boss = {
             channel(attacker, mod(attacker.wisdom));
         },
         MultiSlash: function(attacker, defender) {
-            printA(attacker, 'Multi Slash', 'SP');
+            printA(attacker, 'Multi Slash', 'SP', 4);
                 if(attacker.SP > 0) {
                     multiAttack(attacker, defender, 4);
                     attacker.SP -= 4;
                 }
         },
         Arcane_Slash: function(attacker, defender) {
-            printA(attacker, "Arcane Slash", 'MP');
+            printA(attacker, "Arcane Slash", 'MP', 1);
             fireball(attacker, defender);
         },
     },
@@ -243,17 +275,17 @@ function copy(oldObject) {
     return newObject;
 }
 
-function printA (attacker, actName, points) {
+function printA (attacker, actName, points, cost) {
     switch (points) {
         case 'SP':
-        if (attacker.SP > 0) {
+        if (attacker.SP >= cost) {
             printC(attacker.name + ' uses ' + actName + '!');
         } else {
             printC(attacker.name + ' is out of ' + points + '!');
         }
         break;
         case 'MP':
-        if (attacker.MP > 0) {
+        if (attacker.MP >= cost) {
             printC(attacker.name + ' uses ' + actName + '!');
         } else {
             printC(attacker.name + ' is out of ' + points + '!');
@@ -276,7 +308,7 @@ function levelUp(char) {
     char.damage++;
     char.dmgBns++;
     char.strength += roll(4) + mod(char.strength);
-    char.dexterity += roll(4) + mod(char.dexterity);
+    char.dexterity += roll(2);
     char.constitution += roll(4) + mod(char.constitution);
     char.intelligence += roll(4) + mod(char.intelligence);
     char.wisdom += roll(4) + mod(char.wisdom);
@@ -296,7 +328,7 @@ function beforeTurn(char) {
 function afterTurn(char) {
     switch (char.debuff){
         case 'poison':
-		let psnDmg = roll(6) - mod(char.constitution);
+		let psnDmg = roll(4) + roll(4) + roll(4);
         	if(psnDmg > 0) {
 		   		char.HP-= psnDmg;
         		printC(char.name + " takes " + psnDmg + "pts of poison dmg!");
@@ -348,9 +380,9 @@ function turn(char, opponent, act) {
     beforeTurn(char);
     
     //stunned
-    if(char.stunCounter <= 0) {
-        delete char.stunCounter;
-		printC(cpu.name + " is no longer stunned!");        
+    if(char.stunCounter == 0) {
+        printC(char.name + " is no longer stunned!");
+        char.stunCounter--;        
     }
     if(char.stunCounter > 0) {
         char.stunCounter--;
@@ -374,9 +406,9 @@ function cpuTurn(cpu, target) {
     beforeTurn(target);
     beforeTurn(cpu);
     //stunned
-    if(cpu.stunCounter <= 0) {
-        delete cpu.stunCounter;
-		printC(cpu.name + " is no longer stunned!");
+    if(cpu.stunCounter == 0) {
+        printC(cpu.name + " is no longer stunned!");
+        cpu.stunCounter--;
     }
     if(cpu.stunCounter > 0) {
         cpu.stunCounter--;
@@ -538,7 +570,7 @@ function magicMissles(attacker, defender) {
         let bolts = 0;
         for(i = 0; i < attacker.SP; i++) {
             if (roll(20) + mod(attacker.intelligence) > defender.AC) {
-                dmg += roll(attacker.damage) + mod(attacker.intelligence) + attacker.dmgBns;
+                dmg += roll(attacker.damage) + attacker.dmgBns;
                 bolts++;
             }
         }
@@ -580,9 +612,16 @@ function kick(attacker, defender) {
 }
 
 function stun(attacker, defender) {
-	if(roll(20) + mod(defender.constitution) > 12 + mod(attacker.strength)) {
-    defender.stunCounter = roll(4);
-    printC(defender.name + " is stunned!");
+	if(roll(20) > 10 + mod(defender.constitution)) {
+        if(defender.stunCounter == undefined || defender.stunCounter < 0) {
+            defender.stunCounter = 0;
+        }
+        if(defender.stunCounter == 0) {
+            defender.stunCounter += roll(4);
+            printC(defender.name + " is stunned!");
+        } else {
+		printC(defender.name + " cannot be more stunned!");
+        }
 	} else {
 		printC(defender.name + " resists stun!");
 	}
