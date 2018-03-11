@@ -1,4 +1,4 @@
-var preFight = "</p><p>The announcer calls out with a bellow, \"Let the games begin!. Contestants, choose your opponents wisely. Only one of you may ever leave this arena alive!";
+var preFight = "</p><p>The announcer calls out with a bellow, \"Let the games begin!. Contestants, choose your opponents wisely. Only one of you will leave this arena alive!";
 
 function printC (str) {
     str = str + '<br>';
@@ -49,16 +49,15 @@ var charList = {
                     attacker.stance = 'offensive';
                     printC(attacker.name + ' assumes an offensive stance!');                   
                     attacker.AC-=6;
-                    attacker.damage+=mod(attacker.strength);
-                    attacker.dmgBns+=mod(attacker.strength);
+                    attacker.damage+=attacker.dmgBns;
                     attacker.dexterity+=mod(attacker.strength) * 2;
                 }
                 if(attacker.stance === 'defensive') {
                     attacker.stance = 'offensive';
                     printC(attacker.name + ' assumes an offensive stance!');                    
                     attacker.AC-=12;
-                    attacker.damage+=mod(attacker.strength);
-                    attacker.dmgBns+=mod(attacker.strength);
+                    attacker.damage+=attacker.dmgBns;
+                    attacker.dexterity+=mod(attacker.strength) * 2;
                 }
             },
             Guard_Stance: function(attacker) {
@@ -71,16 +70,15 @@ var charList = {
                     attacker.stance = 'defensive';
                     printC(attacker.name + ' assumes a defensive stance!');
                     attacker.AC+=12;
-                    attacker.damage-=mod(attacker.strength);
-                    attacker.dmgBns-=mod(attacker.strength);
+                    attacker.damage-=attacker.dmgBns;                    
                     attacker.dexterity-=mod(attacker.strength) * 2;
                 }
             },
         },
         story: {
             backStory: "You remember that you are Mance Krauss, a knight of Erdwynn, and first sword of the kingdom of Sommer's Glen.</p><p>During the Seven Year War, your king ordered you abandon your post to escort his winemaker to the vineyard beyond the castle walls. Though you acted according to your king, when you abandoned your post, a raiding party slipped through the gates and infiltrated the palace. Sparing the king to use as a hostage, they murdered the rest of the royal family. The king was made to order the opening of Sommer's Glen's main gate, allowing the invading army of Belan to sieze control of the castle and the realm. Your brothers in arms were executed and the kingdom conquered by the time you returned with the casks of wine you were sent for.</p><p>Despite murdering the winemaker for convincing the king of ordering such a fool's errand, there was nothing else you could do. Facing certain death at the hands of your enemies, or disgrace, you chose to survive and fled the realm.</p><p>Since entering your exile, you have roamed the lands in search of appropriate penance and some kind of peace. Your search led you to the forests of Nerdim and now here...",
-            loseText: "",
-            winText: "I am duh best knight",
+            loseText: "The knight falls on one knee, beaten. His eyes flash with remorse at the thought of never regaining the honor he lost for his disgrace. However, he closes his eyes and coughs the blood from his throat before drawing one last breath.</p><p>With the thought of rejoining his brethren in the afterlife, his face betrays the faintest smile before he falls to the ground and breathes no more.",
+            winText: "Having bested the announcer, the crowd stares down at you in shock. You rip the enchanted blade from his hands and examine it briefly. You feel within it power beyond imagination.</p><p>You raise the blade above your head and look to the crowd. They begin to cheer raucously at your show of valor and might.</p><p>The crowd begins to empty the stands and flood the arena. You are swept off your feet and carried out of the arena by the crowd, who parade you down the streets, their new champion.</p><p>Though weary from battle, your mind races with thoughts of how you will rule your new kingdom.",
         },//END STORY
         imgSrcLeft:'./assets/images/char6left.png',
         imgSrcRight:'./assets/images/char6right.png',
@@ -121,9 +119,9 @@ var charList = {
             },
         },
         story: {
-            backStory: "",
-            loseText: "",
-            winText: "",
+            backStory: "You remember that you are Sanala Rhy'Din, daughter of Q'ara and Bedic, and Princess of Marr.</p><p>Upon coming of age, you were sent away by your parents to learn magic, as is customary for your people. However, instead of attending the local academy, your father, King Bedic, ordered you be taught private lessons by the esteemed sorcerer Enro. The King feared not only for your safety in the academy, but thought it wise to provide the best instruction possible, and who better than one of the legendary heroes?</p><p>The King's decision proved unwise however, as Enro was an arrogant and unforgiving man. He had no patience for novices, and lacked the subtlety and grace needed to help ease a young girl like yourself into the realm of womanhood.</p><p>He demanded you devote yourself wholly to the study of the mystic arts. In lieu of intense study to try and meet his unrealistic expectations, you sought shortcuts.</p><p>After finding a tome on summoning incantations, you discovered the spell to summon the demon Valefor, master of evocation. Armed with this spell and a binding circle, you summoned the demon and attempted to bind him.</p><p>He easily bested your attempts to contain him however, and offered you two choices: die now and offer your soul as punishment for summoning him, or accept his power and forfeit your soul upon death.</p><p>Realizing you had made a grave mistake and thinking you could at least buy yourself more time, you accepted his offered and made a pact in exchange for power.</p><p>After waking from a terrible dream, you found yourself in the smoldering ruins of your kingdom. Enro laid at your feet, mortally injured and scowling you.</p><p>\"What have you done?\" He fell silent and still after he spoke his last words.</p><p>After years spent wandering and searching for a way to best Valefor and free yourself from his chains, you found yourself approaching Fandalin in the forest of Nerdim. Now here you are in this strange arena.",
+            loseText: "The sorcerer grasps at her chest, frantic and unable to breath. Light pours from her eyes and mouth while demonic laughter fills the air. Her face contorts in terror at the sound. Suddenly, she freezes in place. Her form seems to crinkle and crack, before the arena is rocked by an explosion.</p><p>She vaporizes before the crowd, leaving only a small charred crater where she stood, and faint echoes of the unholy laughter reverberating through the air.",
+            winText: "The announcer, still and lifeless, lay before you. Rolling his lifeless body aside, you grab his enchanted sword.</p><p>You instantly realize the magnitude of the power contained within the blade. Wasting no time, you whisper the incantation that you will never forget, the one that summons the demon Valefor.</p><p>With a blinding flash, the crowd gasps at the sight of the demon before them.</p><p>\"What fool dares summon Valefor?\" The beast's voice sends shivers through the spectators. He turns to you and his lips draw into a grin.</p><p>Before he can say another word, you drive the spellblade deep into his body, impaling the demon. Valefor drops to one knee and grasps the blade in an attempt to wrest it from his chest. While the demon is distracted, you whisper the words to dispel the containment magic on the blade, followed by those to cast blink.</p><p>You watch the explosion from high above the arena, safely insulated from the blast in the space between planes. You see that the battlegrounds were situated in the middle of a city that spanned the entirety of a free-floating island. At least, they did before the explosion shattered a large portion of it. and whisper the words to dispel the containment magic on the blade.</p><p>Once you finish marvelling at the destruction, you feel a peace you have not known for what feels like ages. Freedom. You cast a teleportation spell and leave the Umbral plane.",
         },
         imgSrcLeft:'./assets/images/char2left.png',
         imgSrcRight:'./assets/images/char2right.png',
@@ -152,9 +150,9 @@ var charList = {
             },
         },
         story: {
-            backStory: "",
-            loseText: "I am duh worst rogue",
-            winText: "",
+            backStory: "You remember that you are Lox Kellan, and you immediately swear that you will never drunkenly decide to travel alone again.</p><p> As the highest paid and most feared Assassin in Freeport, you naturally began to garner more and more enemies. Eventually the attempts on your life began to outweigh the allure Freeport's notoriously beautiful women, and you decided it was time to relocate. So you packed your bags and fled the city under the cover of darkness, stealing nips from your flask as you watched the city disappear over the horizon.</p><p>Accepting only enough work to keep your wallet filled and your flask full, you moved from city to city all across Erthos, leaving numerous dead bodies and discarded maidens in your wake.</p><p>After an altercation in a lowly inn at the end of a night of drinking, you found yourself wandering through Nerdim forest heading towards Fandalin. If it wasn't for your carelessness and inebriation, those thugs never would have gotten the drop on you.</p><p>To make matters worse, you are painfully sober and staring down an awful death participating in some terrible gladiator show.</p><p> Heaving a deep sigh, your hand brushes your coat pocket, and you feel your flask tucked close to your chest. You quickly snatch it out and gulp down the  liquor within. Maybe things aren't so bad after all.",
+            loseText: "The rogue, bloodied and wounded, discards his rapier and dagger before easing himself to the ground. However, lacking sufficient strength, he trips and lays himself out in the dirt.</p><p>Lying supine and staring at the sky, totally oblivious to the crowd and his opponent, he produces his flask and pours the last drops into his mouth before his arm goes limp and the life leaves his eyes.",
+            winText: "As the announcer falls, you pause to read the crowd, curious as to whether they will cheer or boo the death of their leader.</p><p>To your relief, the crowd erupts into uproarious cheer. You stand straight and begin to bow repeatedly and wave to the audience. When spectators begin to enter the arena grounds, you fish a smoke pellet from your belt and palm it discreetly, waiting for your new fans to approach.</p><p>Before the crowd gets too close, you smash the pellet and surround yourself and the announcer in smoke. Quickly, you loot his body, searching for gold, valuables, and booze. Unfortunately, with time only for a cursory glance, you only find the heavy sword he used in battle. You deem it too heavy and unwieldly to use or steal and quickly shed your cloak. </p><p>As the first fans approach, you mix in with the crowd, using the excitement and confusion to slip away.</p><p>Outside the arena, you make your way to the nearest pub in search of ale and women.",
         },
         imgSrcLeft:'./assets/images/char3left.png',
         imgSrcRight:'./assets/images/char3right.png',
@@ -177,7 +175,7 @@ var charList = {
         speed: 20,
         actions: {
             Focus: function(attacker){
-                channel(attacker, mod(attacker.wisdom));
+                channel(attacker, attacker.dmgBns);
             },
             Double_Strike: function(attacker, defender) {
                 multiAttack(attacker, defender, 2);
@@ -191,9 +189,9 @@ var charList = {
             }, 
         },
         story: {
-            backStory: "",
-            loseText: "",
-            winText: "",
+            backStory: "You remember that you are Medin of the Empty Hand, disciple of Syr, and master of the martial arts.</p><p>As an orphan, you were taken in by monks from hidden monastery in the Tolsar Mountains and trained in their ways from a young age.</p><p>Each day you spent seven hours tempering your body into a weapon in the service of Syr the Tranquil, and the remaining daylight studying Syr's teachings and maintaining the monastery grounds.</p><p>As you aged, your martial skills continued to develop and even surpass the elder monks.</p><p>At the annual tournament before your eighteenth name day, you competed against your brothers for sport in celebration of Syr and his teachings.</p><p>As you progressed through the rankings, whispers circulated about your love of battle and the severity of the injuries you imposed on your opponents.</p><p>In the final bout, not knowing your own strength, you delivered a lethal blow to your opponent, one of your fellow monks.</p><p>You were exiled from the monastery and forced to denounce yourself before Syr.</p><p>Forced to wander the Earth, shamed and exiled, you brought justice to evildoers and devoted your life to honoring Syr's teachings despite your mistakes.</p><p>Your quest found you in the forest of Nerdim, on your way to Fandalin to ask guidance from Nephilhelm, Syr's most famous disciple. Now you find yourself in another wretched tournament, this time forced to use your fists for bloodshed.",
+            loseText: "The monk breathes heavily trying to catch his breath. His body can no longer ignore his injuries through sheer will alone, and his fighting stance relaxes slightly. As his breath slows, he recites Syr's final blessing quietly, not loud enough for any to hear. When he finishes, still standing, his arms fall to his sides. He stands still as a statue on the battleground, his body too strong to fall, despite his defeat.",
+            winText: "The announcer, beaten and broken, lays at your feet.</p><p>The cheers of the crowd at your victory only serve to enrage you. \"This contest is an affront to Syr\", you think to yourself. Looking down at the announcer's corpse, you see his spellblade at his feet. You pick the blade up and hold it high above your head. The crowd cheers even louder at your display.</p><p>You deploy all of your might in bringing the blade down into the ground, unleashing the awesome fury of its power on the floating landmass the city and arena are built upon.</p><p>Cheers turn to screams and the floating island splits in two, and the large buildings beginning to crumble around the arena. You feel your stomach heave as the entire island begins to fall, the damage dealt to its core so absolute that it can no longer hold itself together.</p><p>You discard the sword, its magic now completely consumed, and watch the destruction of the island.</p><p>As you wait for death, you feel the hand of Syr on your shoulder, and you hear him say with perfect calm, \"Your work is not yet complete, my child.\"",
         },
         imgSrcLeft:'./assets/images/char4left.png',
         imgSrcRight:'./assets/images/char4right.png',
@@ -202,33 +200,38 @@ var charList = {
 
 var boss = {
     name: 'Atlas',
-    HP: 185,
-    AC: 13,
-    MP: 0,
-    SP: 4,
-    damage: 4,
-    dmgBns: 2,
-    strength: 8,
-    dexterity: 17,
-    constitution: 14,
-    intelligence: 10, 
+    HP: 300,
+    AC: 10,
+    MP: 10,
+    SP: 12,
+    damage: 10,
+    dmgBns: 4,
+    strength: 15,
+    dexterity: 16,
+    constitution: 15,
+    intelligence: 16, 
     wisdom: 14,
     charisma: 12,
-    speed: 20,
+    speed: 40,
     actions: {
         Focus: function(attacker){
             channel(attacker, mod(attacker.wisdom));
         },
-        Double_Strike: function(attacker, defender) {
-            multiAttack(attacker, defender, 2);
+        MultiSlash: function(attacker, defender) {
+            printA(attacker, 'Multi Slash', 'SP');
+                if(attacker.SP > 0) {
+                    multiAttack(attacker, defender, 4);
+                    attacker.SP -= 4;
+                }
         },
-        Punishing_Fists: function (attacker, defender) {
-            printA(attacker, 'Punishing Fists!', 'SP');
-            if(attacker.SP > 0) {
-                multiAttack(attacker, defender, roll(attacker.SP + mod(attacker.wisdom)));
-                attacker.SP = 0;
-            }
-        }, 
+        Arcane_Slash: function(attacker, defender) {
+            printA(attacker, "Arcane Slash", 'MP');
+            fireball(attacker, defender);
+        },
+    },
+    story: {
+        preFight: "The announcer leaps from his place in the stands down into the arena before you.</p><p>A hush falls over the crowd and he says, \"Well-met champion! You have given us a marvelous show this day!\"</p><p>He draws his sword and points it at you.</p><p>\"Pray tell, though, Champion, did you expect to leave here with your life? All are tribute to Innovar, and you are no different.\"</p><p>You steel yourself for the final battle, summoning what's left of your strength.",
+        postFight: "The announcer, mortally wounded but still compelled to get the last word, says, \"You think you've won the day... Fool. May Innovar feast your essence for a thousand years.\"</p><p>He chokes on his words and heaves a final, labored breath before collapsing in a heap on the ground.",
     },
     imgSrcLeft:'./assets/images/char1left.png',
     imgSrcRight:'./assets/images/char1right.png',
@@ -271,6 +274,7 @@ function levelUp(char) {
         char.SP++;
     }
     char.damage++;
+    char.dmgBns++;
     char.strength += roll(4) + mod(char.strength);
     char.dexterity += roll(4) + mod(char.dexterity);
     char.constitution += roll(4) + mod(char.constitution);
@@ -666,32 +670,41 @@ $(document).ready(function () {
 				$('<h3>').attr("id", "playerSPnum").attr("class", "playerSPnum").text('SP: ' + game.player.SP + '/' + game.player.maxSP).appendTo('#playerDiv');
             }
             $('<h4>').attr("id", "playerTime").attr("class", "playerTime").appendTo('#playerDiv');
-            $('<h3>').attr("id", "playerTimeNum").attr("class", "playerTimeNum").text('Time').appendTo('#playerDiv');                      
-            $('body').append($('<h1>')
-                        .attr("class", "instr")
-                        .attr("id", "instr")
-                        .text("Choose Your Opponent")
-            );//end append
-            //create opponent images
-            let a = $('<div>').attr("id", "enemies").attr("class", "enemies");
-            let x = Object.keys(game.chars);
-            for(let i = 0; i < x.length; i++){
-                let y = $('<img>');
-                let z = game.chars[x[i]];
-                y.attr("src", z.imgSrcRight)
-                .attr("id", x[i])
-                .on("click", function() {
-                    game.enterBattle(this);
-                });
-                a.append(y);
+            $('<h3>').attr("id", "playerTimeNum").attr("class", "playerTimeNum").text('Time').appendTo('#playerDiv');
+
+            if(game.foeCounter > 0) {
+
+                $('<h1>').attr("class", "instr").attr("id", "instr").text("Choose Your Opponent").appendTo('body');
+                //create opponent images
+                let a = $('<div>').attr("id", "enemies").attr("class", "enemies");
+                let x = Object.keys(game.chars);
+                for(let i = 0; i < x.length; i++){
+                    let y = $('<img>');
+                    let z = game.chars[x[i]];
+                    y.attr("src", z.imgSrcRight)
+                    .attr("id", x[i])
+                    .on("click", function() {
+                        game.enterBattle(this);
+                    });
+                    a.append(y);
+                }//end for
+                $('body').append(a);
+            }//end if foes > 0
+            else {
+                game.enterBattle();
             }
 
-            $('body').append(a);
         },
         enterBattle: function(x) {
-            //x is the pic, use the id
-            let enemy = $(x).attr("id");
-            game.currentOpponent = copy(game.chars[enemy]);
+            let enemy = 'balls';
+            if(game.foeCounter > 0) {
+                //x is the pic, use the id
+                enemy = $(x).attr("id");
+                game.currentOpponent = copy(game.chars[enemy]);
+            } else {
+                game.currentOpponent = copy(boss);
+                enemy = 'boss';
+            }
             //get data for enemy healthbars
             game.currentOpponent.maxHP = game.currentOpponent.HP;
             game.currentOpponent.maxMP = game.currentOpponent.MP;
@@ -717,19 +730,29 @@ $(document).ready(function () {
             }
             $('<h4>').attr("id", "enemyTime").attr("class", "enemyTime").appendTo('#enemyDiv');
             $('<h3>').attr("id", "enemyTimeNum").attr("class", "enemyTimeNum").text('Time').appendTo('#enemyDiv');
-            //remove enemy pics
-            $('#instr').fadeOut('slow');
-            $('#enemies').fadeOut('slow', function(){
-                $('#enemies').remove();
-                $('#instr').remove();
-                
-                //add div for combat text
+            if(game.foeCounter > 0) {
+                //remove enemy pics
+                $('#instr').fadeOut('slow');
+                $('#enemies').fadeOut('slow', function(){
+                    $('#enemies').remove();
+                    $('#instr').remove();
+                    
+                    //add div for combat text
+                    $('<div>').attr("id", "combatTextContainer").attr("class", "combatTextContainer").appendTo('body');            
+                    $('<div>').attr("id", "combatText").attr("class", "combatText").appendTo('#combatTextContainer');
+                    //add div for btns
+                    $('<div>').attr("id", "actionBtns").attr("class", "actionBtns").appendTo('body');
+                    game.drawButtons();
+                });
+            } //end if foes > 0
+            //else if foes = 0, and it's boss time,
+            else {
                 $('<div>').attr("id", "combatTextContainer").attr("class", "combatTextContainer").appendTo('body');            
                 $('<div>').attr("id", "combatText").attr("class", "combatText").appendTo('#combatTextContainer');
                 //add div for btns
                 $('<div>').attr("id", "actionBtns").attr("class", "actionBtns").appendTo('body');
                 game.drawButtons();
-            });
+            }
             game.battleStarted = false;
         },//end enterBattle
 
@@ -903,7 +926,17 @@ $(document).ready(function () {
                 }
                 //if no more dudes, this
                 if (game.foeCounter == 0) {
-                    game.battleWon(game.characterSelect, game.player.story.winText, 'player');
+                    let x = function() {game.storyPage(game.enemyChoose, boss.story.preFight, 'boss')}
+                    game.battleWon(x, game.currentOpponent.story.loseText, 'foe');
+                    // game.battleWon(game.characterSelect, game.player.story.winText, 'player');
+                }
+                //if boss defeated
+                if(game.foeCounter < 0) {
+                    let credits = function (){game.storyPage(game.characterSelect,'Thanks for Playing!', 'boss')}
+                    let ending = function () {game.storyPage(credits, game.player.story.winText, 'player')}
+                    game.battleWon(ending, game.currentOpponent.story.postFight, 'boss');
+                    
+                    // game.battleWon(game.characterSelect, 'boss lost text here', 'boss');
                 }
             }
         },
