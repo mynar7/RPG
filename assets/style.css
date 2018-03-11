@@ -14,8 +14,8 @@ body {
     margin: auto;
     font-family: inherit;
     font-size: inherit;
-    background-color: rgb(104, 131, 105);
-    color: rgb(192, 190, 190);
+    background-color: rgb(55, 114, 57);
+    color: rgb(212, 211, 211);
     border: 5px rgb(67, 138, 108) outset;
     border-radius: 4px;
 }
@@ -105,11 +105,9 @@ body {
 .charSelDiv>img:hover {
     border-top: 10px rgb(29, 128, 209) groove;
     border-bottom: 10px rgb(29, 128, 209) groove;
-    border-top-right-radius: 100px;
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 100px;
-    border-bottom-right-radius: 20px;
-    padding: 20px 0;
+    border-radius: 100px;
+    background-color: rgba(33, 135, 218, 0.418);
+    transition: border-radius 0.5s, background-color 3s;
 }
 .enemies {
     clear: both;
@@ -117,11 +115,9 @@ body {
 .enemies>img:hover {
     border-top: 10px rgb(253, 31, 31) groove;
     border-bottom: 10px rgb(253, 31, 31) groove;
-    border-top-right-radius: 100px;
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 100px;
-    border-bottom-right-radius: 20px;
-    padding: 20px 0;
+    border-radius: 100px;
+    background-color: rgba(253, 31, 31, 0.644);
+    transition: border-radius 0.5s, background-color 3s;
 }
 
 #playerIntro {
@@ -152,7 +148,7 @@ body {
 }
 
 .enemyDiv>img {
-    border-bottom: 10px rgb(75, 43, 43) ridge;
+    border-bottom: 10px rgb(88, 89, 93) ridge;
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 0px;
     padding-bottom: 5px;
@@ -160,7 +156,7 @@ body {
 }
 
 .playerHP, .enemyHP {
-    background-color: rgb(62, 214, 62);
+    background-color: rgb(56, 197, 56);
 }
 .playerMP, .enemyMP {
     background-color: rgb(182, 24, 182);
@@ -232,11 +228,10 @@ body {
 }
 
 #Continue {
-    width: 30%;
+    min-width: 30%;
     height: 50px;
+    display: block;
     margin: auto;
-    position: relative;
-    left: 30%;
     font-family: inherit;
     font-size: inherit;
     background-color: rgb(83, 52, 81);
@@ -246,7 +241,10 @@ body {
 }
 
 @media screen and (max-width: 401px) {
-    
+    .playerBattlePic, .enemyBattlePic {
+        width: 100px;
+        height: 100%;
+    }
     .actionBtn {
         min-width: 99%;
     }
@@ -275,7 +273,7 @@ body {
     }
     .charPics {
         min-width: 100%;
-        margin: 2px auto 0;
+        margin: 5px auto 0;
         box-sizing: border-box;
         background-image: none;
     }
