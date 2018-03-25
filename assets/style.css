@@ -22,11 +22,14 @@ body {
 
 .initial {
     background-image: url('./images/forest.jpg');
+    background-position: bottom;
     position: absolute;
     top: 0;
     bottom: 0;
     right: 0;
     left: 0;
+    max-height: 100%;
+    overflow: auto;
 }
 
 .storySetup, .storyPageDiv {
