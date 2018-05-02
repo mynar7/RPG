@@ -18,15 +18,15 @@ In addition to dealing damage, there are various moves that inflict status ailme
 * CSS
 
 ## Challenges
-* When coding the game, I used literal objects instead of constructor functions to contain all the attributes for each character. However, the characters were intended to start each new battle with their HP/MP/SP at max. Characters also level up after winning a battle and start the next battle with higher stats. Also I originally had the moves deleted from the object when a player depleted his skill points. However because the character data was coded as literal objects, I wasn't able to restore those methods by copying the object.
+<ul><li> When coding the game, I used literal objects instead of constructor functions to contain all the attributes for each character. However, the characters were intended to start each new battle with their HP/MP/SP at max. Characters also level up after winning a battle and start the next battle with higher stats. Also I originally had the moves deleted from the object when a player depleted his skill points. However because the character data was coded as literal objects, I wasn't able to restore those methods by copying the object.
 
 Fortunately, I was able to use jQuery's extend to deep copy the character objects and apply changes as needed to stats. This way I could level up a character, copy the character object before a battle, and then after battle use the original object to level up and continue the game, discarding the battle character object.
 
-After becoming more familiar with constructor functions, I realized I should have written all the character data as a constructor, allowing me to create objects as needed and with whatever stats I wanted. Also, I believe I could have reduced the amount of code by having a constructor for the basic character objects and applying further changes as necessary.
+After becoming more familiar with constructor functions, I realized I should have written all the character data as a constructor, allowing me to create objects as needed and with whatever stats I wanted. Also, I believe I could have reduced the amount of code by having a constructor for the basic character objects and applying further changes as necessary.</li>
 
-* I also had a hard time finding assets I could use for the game. Going forward I realize that I need to look into pixel art or a similar means of creating my own assets instead of searching for creative commons assets or commissioning artists.
+<li>I also had a hard time finding assets I could use for the game. Going forward I realize that I need to look into pixel art or a similar means of creating my own assets instead of searching for creative commons assets or commissioning artists.</li>
 
-* During testing, I received feedback that the game could benefit from instructions. Having spent so much time on the game logic and UI, I did not realize that players wouldn't immediately be familiar with the game mechanics. I think I could remedy this by adding tooltips for the characters and move buttons, and also by possibly adding a general tutorial/mechanics page before the player initially chooses a character.
+<li>During testing, I received feedback that the game could benefit from instructions. Having spent so much time on the game logic and UI, I did not realize that players wouldn't immediately be familiar with the game mechanics. I think I could remedy this by adding tooltips for the characters and move buttons, and also by possibly adding a general tutorial/mechanics page before the player initially chooses a character.</li></ul>
 
 ## Future Updates
 * Tooltips
