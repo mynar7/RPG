@@ -6,7 +6,10 @@ body {
     background-image: url('./images/floatingCastle.jpg');
     background-position: top;
 }
-
+span.focus {
+    font-weight: 600;
+    font-size: 2rem;
+}
 .start {
     width: 20%;
     height: 50px;
